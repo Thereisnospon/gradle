@@ -77,9 +77,11 @@ class CustomResult implements Serializable {
 
         when:
 
-        println "-> STARTING SECOND EXECUTION"
+        System.err.println "-> STARTING SECOND EXECUTION"
 
         def result = worker.run("ok")
+
+        System.err.println "-> DONE SECOND EXECUTION"
 
         then:
         result == "converted"
@@ -91,11 +93,11 @@ class CustomResult implements Serializable {
         def worker = builder.build()
         def result1 = worker.run(12.toLong())
 
-        println "-> STARTING SECOND EXECUTION"
+        System.err.println "-> STARTING SECOND EXECUTION"
 
         def result2 = worker.run(null)
 
-        println "-> STARTING THIRD EXECUTION"
+        System.err.println "-> STARTING THIRD EXECUTION"
 
         def result3 = worker.run(123.toLong())
 
