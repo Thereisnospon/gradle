@@ -69,6 +69,9 @@ class CustomResult implements Serializable {
         when:
         def builder = workerFactory.singleRequestWorker(BrokenTestWorker.class)
         def worker = builder.build()
+
+        System.err.println "-> STARTING FIRST FAILED EXECUTION"
+
         worker.run("abc")
 
         then:
@@ -77,7 +80,7 @@ class CustomResult implements Serializable {
 
         when:
 
-        System.err.println "-> STARTING SECOND EXECUTION"
+        System.err.println "-> STARTING SECOND SUCCESSFUL EXECUTION"
 
         def result = worker.run("ok")
 
@@ -90,6 +93,7 @@ class CustomResult implements Serializable {
     def "can reuse worker proxy to run multiple worker processes"() {
         when:
         def builder = workerFactory.singleRequestWorker(TestWorker.class)
+        builder.javaCommand.systemProperty("org.gradle.worker.diagnostics", "true")
         def worker = builder.build()
         def result1 = worker.run(12.toLong())
 
@@ -100,6 +104,8 @@ class CustomResult implements Serializable {
         System.err.println "-> STARTING THIRD EXECUTION"
 
         def result3 = worker.run(123.toLong())
+
+        System.err.println "-> DONE EXECUTION"
 
         then:
         result1 == "[12]"

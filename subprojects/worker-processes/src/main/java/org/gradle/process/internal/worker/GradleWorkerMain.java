@@ -31,15 +31,31 @@ import java.util.concurrent.Callable;
  * sets up the worker ClassLoader, and then delegates to {@link org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker} to deserialize and execute the action.
  */
 public class GradleWorkerMain {
+    static void log(String message) {
+        if (System.getProperty("org.gradle.worker.diagnostics") != null) {
+            System.err.println(message  );
+            System.err.flush();
+        }
+    }
+
     public void run() throws Exception {
+        log("starting main");
+
         DataInputStream instr = new DataInputStream(new EncodedStream.EncodedInput(System.in));
 
         // Read shared packages
         int sharedPackagesCount = instr.readInt();
+
+        log("shared package count = " + sharedPackagesCount);
+
         List<String> sharedPackages = new ArrayList<String>(sharedPackagesCount);
         for (int i = 0; i < sharedPackagesCount; i++) {
-            sharedPackages.add(instr.readUTF());
+            String sharedPackage = instr.readUTF();
+            log("shared package = " + sharedPackage);
+            sharedPackages.add(sharedPackage);
         }
+
+        log("done reading shared packages");
 
         // Read worker implementation classpath
         int classPathLength = instr.readInt();
@@ -71,9 +87,11 @@ public class GradleWorkerMain {
     public static void main(String[] args) {
         try {
             new GradleWorkerMain().run();
+            log("done with process");
             System.exit(0);
         } catch (Throwable throwable) {
             throwable.printStackTrace(System.err);
+            log("process failed");
             System.exit(1);
         }
     }
