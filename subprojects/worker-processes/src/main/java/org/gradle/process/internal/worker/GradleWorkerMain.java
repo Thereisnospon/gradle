@@ -33,7 +33,7 @@ import java.util.concurrent.Callable;
 public class GradleWorkerMain {
     static void log(String message) {
         if (System.getProperty("org.gradle.worker.diagnostics") != null) {
-            System.err.println(message  );
+            System.err.println(message);
             System.err.flush();
         }
     }
