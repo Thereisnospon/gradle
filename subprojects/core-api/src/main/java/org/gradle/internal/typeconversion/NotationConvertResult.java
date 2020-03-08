@@ -16,11 +16,16 @@
 
 package org.gradle.internal.typeconversion;
 
+/**
+ * 符号转换的结果
+ * @param <T>
+ */
 public interface NotationConvertResult<T> {
     boolean hasResult();
 
     /**
      * Invoked when a {@link NotationConverter} is able to convert a notation to a result.
+     * 当 NotationConverter 能够转换符号时，设置结果
      */
     void converted(T result);
 }

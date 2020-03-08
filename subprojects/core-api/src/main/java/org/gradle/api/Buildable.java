@@ -20,6 +20,7 @@ import org.gradle.api.tasks.TaskDependency;
 /**
  * A {@code Buildable} represents an artifact or set of artifacts which are built by one or more {@link Task}
  * instances.
+ * 表示 被一个或多个 Task 构建出的 一个或一组 artifact
  */
 public interface Buildable {
     /**
@@ -29,6 +30,7 @@ public interface Buildable {
      *
      * @return The dependency. Never returns null. Returns an empty dependency when this artifact is not built by any
      *         tasks.
+     * 返回构建这个 artifact 的一组 task 依赖
      */
     TaskDependency getBuildDependencies();
 }

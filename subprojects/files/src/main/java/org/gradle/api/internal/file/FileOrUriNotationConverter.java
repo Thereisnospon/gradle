@@ -34,6 +34,9 @@ import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 文件路径/uri/http 等转换成 File
+ */
 public class FileOrUriNotationConverter implements NotationConverter<Object, Object> {
 
     private static final Pattern URI_SCHEME = Pattern.compile("([a-zA-Z][a-zA-Z0-9+-\\.]*:).+");

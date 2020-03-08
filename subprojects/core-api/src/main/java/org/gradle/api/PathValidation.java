@@ -18,6 +18,7 @@ package org.gradle.api;
 
 /**
  * An enumeration for describing validation policies for file paths.
+ * 文件路径的验证策略
  */
 public enum PathValidation {
     NONE(), EXISTS(), FILE(), DIRECTORY()

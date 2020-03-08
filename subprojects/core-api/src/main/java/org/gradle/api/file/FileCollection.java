@@ -29,6 +29,7 @@ import java.util.Set;
  * is often used to define a classpath, or to add files to a container.</p>
  *
  * <p>You can obtain a {@code FileCollection} instance using {@link org.gradle.api.Project#files}.</p>
+ * 表示你可以用多种方式查询的一组文件
  */
 @HasInternalProtocol
 public interface FileCollection extends Iterable<File>, AntBuilderAware, Buildable {
@@ -37,6 +38,7 @@ public interface FileCollection extends Iterable<File>, AntBuilderAware, Buildab
      *
      * @return The file.
      * @throws IllegalStateException when this collection does not contain exactly one file.
+     * 返回该文件集中的单独文件。如果该文件集文件个数不为1 则抛出异常
      */
     File getSingleFile() throws IllegalStateException;
 
@@ -44,6 +46,7 @@ public interface FileCollection extends Iterable<File>, AntBuilderAware, Buildab
      * Returns the contents of this collection as a Set.
      *
      * @return The files. Returns an empty set if this collection is empty.
+     * 所有文件
      */
     Set<File> getFiles();
 
@@ -53,6 +56,7 @@ public interface FileCollection extends Iterable<File>, AntBuilderAware, Buildab
      *
      * @param file The file to check for.
      * @return true if this collection contains the given file, false otherwise.
+     * 返回该文件集是否包含文件 file. 比 getFiles().contains(file) 高效
      */
     boolean contains(File file);
 
@@ -61,6 +65,7 @@ public interface FileCollection extends Iterable<File>, AntBuilderAware, Buildab
      * &lt;path&gt; element.
      *
      * @return The path. Returns an empty string if this collection is empty.
+     * 返回平台相关的路径
      */
     String getAsPath();
 
@@ -72,6 +77,7 @@ public interface FileCollection extends Iterable<File>, AntBuilderAware, Buildab
      *
      * @param collection The other collection. Should not be null.
      * @return A new collection containing the union.
+     * 两个文件集的并集, 并且返回的集合会追踪源集合的变化
      */
     FileCollection plus(FileCollection collection);
 
@@ -83,6 +89,7 @@ public interface FileCollection extends Iterable<File>, AntBuilderAware, Buildab
      *
      * @param collection The other collection. Should not be null.
      * @return A new collection containing the difference.
+     * 两个文件集的差集， 并且返回的集合会追踪源集合的变化
      */
     FileCollection minus(FileCollection collection);
 
@@ -94,6 +101,8 @@ public interface FileCollection extends Iterable<File>, AntBuilderAware, Buildab
      *
      * @param filterClosure The closure to use to select the contents of the filtered collection.
      * @return The filtered collection.
+     * 过滤文件集，在 filterClosure 返回 file 的过滤 boolean
+     * 返回的集合
      */
     FileCollection filter(Closure filterClosure);
 
@@ -111,6 +120,7 @@ public interface FileCollection extends Iterable<File>, AntBuilderAware, Buildab
      * getFiles().isEmpty()}.
      *
      * @return true if this collection is empty, false otherwise.
+     * 文件集是否为空 比 getFiles().isEmpty() 高效
      */
     boolean isEmpty();
 

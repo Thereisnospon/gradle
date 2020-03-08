@@ -19,6 +19,7 @@ import java.util.Collection;
 
 /**
  * A file tree whose contents are contained in zero or more local directories.
+ * 包含一个或多个本地目录
  */
 public interface LocalFileTree extends MinimalFileTree {
     Collection<DirectoryFileTree> getLocalContents();

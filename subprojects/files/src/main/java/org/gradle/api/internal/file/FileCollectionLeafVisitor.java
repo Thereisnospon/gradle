@@ -27,16 +27,19 @@ import java.io.File;
 public interface FileCollectionLeafVisitor {
     /**
      * Visits a {@link FileCollectionInternal} element that cannot be visited in further detail.
+     * 访问一个 FileCollectionInternal 元素，并且不能访问更多的细节。
      */
     void visitCollection(FileCollectionInternal fileCollection);
 
     /**
      * Visits a {@link FileTreeInternal} that does not represents a directory in the file system.
+     * 访问一个不在文件系统上以 directory 形式存在的 FileTreeInternal (tar,zip?)
      */
     void visitGenericFileTree(FileTreeInternal fileTree);
 
     /**
      * Visits a file tree at a root file on the file system (potentially filtered).
+     * 访问文件系统上 一个 file tree 的根节点
      */
     void visitFileTree(File root, PatternSet patterns);
 }

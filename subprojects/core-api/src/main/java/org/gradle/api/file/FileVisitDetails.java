@@ -24,6 +24,7 @@ public interface FileVisitDetails extends FileTreeElement {
 
     /**
      * Requests that file visiting terminate after the current file.
+     * 请求在访问该文件后 停止文件的遍历
      */
     void stopVisiting();
 }

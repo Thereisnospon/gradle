@@ -38,6 +38,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * No regard is given to what the actual file system represented by this actually looks like.
  * That is, no attention is paid to whether a particular file is a directory, regular file or anything else.
  * Instances do not access the filesystem.
+ * TODO thereisnospon
  */
 @ThreadSafe
 public class FileSystemSubset {

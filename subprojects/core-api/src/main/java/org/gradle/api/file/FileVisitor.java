@@ -17,12 +17,14 @@ package org.gradle.api.file;
 
 /**
  * <p>A {@code FileVisitor} is used to visit each of the files in a {@link FileTree}.</p>
+ * 访问文件中的每个文件
  */
 public interface FileVisitor {
     /**
      * Visits a directory.
      *
      * @param dirDetails Meta-info about the directory.
+     * 访问目录
      */
     void visitDir(FileVisitDetails dirDetails);
 
@@ -30,6 +32,7 @@ public interface FileVisitor {
      * Visits a file.
      *
      * @param fileDetails Meta-info about the file.
+     * 访问普通文件
      */
     void visitFile(FileVisitDetails fileDetails);
 }

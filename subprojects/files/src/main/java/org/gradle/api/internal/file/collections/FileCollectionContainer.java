@@ -17,10 +17,12 @@ package org.gradle.api.internal.file.collections;
 
 /**
  * A file collection made up of other file collections. Generally, this is either a simple collection, or may be a factory for file collections.
+ * 有其他 文件组 组成的文件组合
  */
 public interface FileCollectionContainer {
     /**
      * Adds the contents of this container to the given context.
+     * 将该容器的 内容添加到给定的 context
      */
     void visitContents(FileCollectionResolveContext context);
 }

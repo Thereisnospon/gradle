@@ -22,6 +22,7 @@ import java.io.File;
 
 /**
  * A file tree with a single file entry.
+ * 单个文件的文件树
  */
 public interface SingletonFileTree extends MinimalFileTree {
     File getFile();

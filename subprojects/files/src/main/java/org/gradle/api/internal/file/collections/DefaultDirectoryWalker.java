@@ -19,7 +19,7 @@ package org.gradle.api.internal.file.collections;
 import org.gradle.internal.nativeintegration.filesystem.FileSystem;
 
 import java.io.File;
-
+//默认的文件遍历器
 public class DefaultDirectoryWalker extends AbstractDirectoryWalker {
     public DefaultDirectoryWalker(FileSystem fileSystem) {
         super(fileSystem);

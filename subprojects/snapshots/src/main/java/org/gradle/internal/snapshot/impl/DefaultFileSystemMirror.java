@@ -27,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * See {@link DefaultFileSystemSnapshotter} for some more details
+ * 在内存中维护一个文件系统的状态
+ * @see FileSystemMirror
  */
 public class DefaultFileSystemMirror implements FileSystemMirror {
     // Maps from interned absolute path for a file to metadata for the file.

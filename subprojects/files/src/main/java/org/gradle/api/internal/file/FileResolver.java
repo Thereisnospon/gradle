@@ -27,6 +27,10 @@ import java.io.File;
 import java.net.URI;
 import java.util.List;
 
+/**
+ * 详细注释看
+ * @see AbstractFileResolver
+ */
 public interface FileResolver extends RelativeFilePathResolver, PathToFileResolver {
     File resolve(Object path, PathValidation validation);
 

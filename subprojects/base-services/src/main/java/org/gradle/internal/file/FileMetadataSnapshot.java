@@ -18,6 +18,7 @@ package org.gradle.internal.file;
 
 /**
  * An immutable snapshot of the metadata of a file.
+ * 不可变的 文件的 metadata 的快照
  */
 public interface FileMetadataSnapshot {
     FileType getType();

@@ -24,7 +24,7 @@ import org.gradle.internal.nativeintegration.filesystem.FileSystem;
 import org.gradle.internal.nativeintegration.services.FileSystems;
 
 import java.io.File;
-
+//default
 public class DefaultSingletonFileTree extends AbstractSingletonFileTree {
     private final File file;
     private final FileSystem fileSystem = FileSystems.getDefault();

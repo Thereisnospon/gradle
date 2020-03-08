@@ -23,7 +23,7 @@ import org.gradle.internal.nativeintegration.filesystem.Stat;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
-
+//带上stopVisiting
 public class DefaultFileVisitDetails extends DefaultFileTreeElement implements FileVisitDetails {
     private final AtomicBoolean stop;
     private final boolean isDirectory;

@@ -28,11 +28,13 @@ public abstract class AbstractSingletonFileTree implements SingletonFileTree, Pa
         this.patterns = patterns;
     }
 
+    //得到文件访问细节内容
     protected abstract FileVisitDetails createFileVisitDetails();
 
     public void visit(FileVisitor visitor) {
         FileVisitDetails fileVisitDetails = createFileVisitDetails();
         if (patterns.isEmpty() || patterns.getAsSpec().isSatisfiedBy(fileVisitDetails)) {
+            //没有过滤规则或者没被过滤
             visitor.visitFile(fileVisitDetails);
         }
     }

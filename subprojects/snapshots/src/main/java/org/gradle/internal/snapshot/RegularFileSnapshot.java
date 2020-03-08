@@ -42,6 +42,7 @@ public class RegularFileSnapshot extends AbstractFileSystemLocationSnapshot {
         return contentHash;
     }
 
+    //hash, lastModify 都得一样
     @Override
     public boolean isContentAndMetadataUpToDate(FileSystemLocationSnapshot other) {
         if (!(other instanceof RegularFileSnapshot)) {

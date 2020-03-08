@@ -17,11 +17,14 @@ package org.gradle.api.internal.file.collections;
 
 /**
  * A file tree which maintains a local copy of itself on the filesystem.
+ * 文件系统中 文件树的拷贝
  */
 public interface FileSystemMirroringFileTree extends MinimalFileTree {
     /**
      * Returns the directory tree that will contain the copy of this file tree, after all elements of this tree have been visited. It is the caller's responsibility to visit the
      * elements of this tree before using the returned directory tree.
+     * 在所有该文件树的元素被访问后， 返回包含文件树的拷贝。
+     * 调用者有责任 在访问这个 return 方法前 访问这棵树的元素
      */
     DirectoryFileTree getMirror();
 }

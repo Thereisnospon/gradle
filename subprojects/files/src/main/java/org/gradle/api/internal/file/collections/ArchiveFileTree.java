@@ -21,6 +21,7 @@ import java.io.File;
 
 /**
  * A file tree which represents an archive fileTree.
+ * 封装类型的文件路径
  */
 public interface ArchiveFileTree extends FileSystemMirroringFileTree {
 

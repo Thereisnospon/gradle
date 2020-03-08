@@ -66,6 +66,7 @@ public class DefaultFileSystemSnapshotter implements FileSystemSnapshotter {
     private final StringInterner stringInterner;
     private final FileSystem fileSystem;
     private final FileSystemMirror fileSystemMirror;
+    //锁相关
     private final ProducerGuard<String> producingSnapshots = ProducerGuard.striped();
     private final DirectorySnapshotter directorySnapshotter;
 
@@ -90,6 +91,7 @@ public class DefaultFileSystemSnapshotter implements FileSystemSnapshotter {
                 return snapshot.getHash();
             }
         }
+        //锁相关
         return producingSnapshots.guardByKey(absolutePath, new Factory<HashCode>() {
             @Nullable
             @Override
@@ -145,6 +147,7 @@ public class DefaultFileSystemSnapshotter implements FileSystemSnapshotter {
     private FileSystemLocationSnapshot snapshotAndCache(InternableString absolutePath, File file, FileMetadataSnapshot metadata, @Nullable PatternSet patternSet) {
         FileSystemLocationSnapshot fileSystemLocationSnapshot = fileSystemMirror.getSnapshot(absolutePath.asNonInterned());
         if (fileSystemLocationSnapshot == null) {
+            //多值返回，判断后面的调用是否被过滤了
             MutableBoolean hasBeenFiltered = new MutableBoolean(false);
             fileSystemLocationSnapshot = snapshot(absolutePath.asInterned(), patternSet, file, metadata, hasBeenFiltered);
             if (!hasBeenFiltered.get()) {

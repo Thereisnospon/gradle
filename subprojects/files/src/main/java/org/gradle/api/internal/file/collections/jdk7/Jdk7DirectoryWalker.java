@@ -39,7 +39,7 @@ import java.util.Deque;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicBoolean;
-
+//jdk7实现
 public class Jdk7DirectoryWalker implements DirectoryWalker {
     private final FileSystem fileSystem;
 

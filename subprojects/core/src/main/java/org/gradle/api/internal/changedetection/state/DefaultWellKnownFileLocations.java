@@ -27,6 +27,8 @@ import java.util.List;
 public class DefaultWellKnownFileLocations implements WellKnownFileLocations {
     private final FileHierarchySet immutableLocations;
 
+    // fileStores 看上去是 DefaultModuleRegistry.getFileStoreRoots
+    // 中返回的 gradleInstallation.getLibDirs() 路径
     public DefaultWellKnownFileLocations(List<CachedJarFileStore> fileStores) {
         FileHierarchySet immutableLocations = DefaultFileHierarchySet.of();
         for (CachedJarFileStore fileStore : fileStores) {

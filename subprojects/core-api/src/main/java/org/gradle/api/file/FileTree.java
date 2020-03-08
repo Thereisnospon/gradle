@@ -31,6 +31,7 @@ import java.util.Set;
  * <p>You can obtain a {@code FileTree} instance using {@link org.gradle.api.Project#fileTree(java.util.Map)},
  * {@link org.gradle.api.Project#zipTree(Object)} or {@link org.gradle.api.Project#tarTree(Object)}.
  * </p>
+ * 代表一些文件的层次。
  */
 @HasInternalProtocol
 public interface FileTree extends FileCollection {

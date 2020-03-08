@@ -20,6 +20,7 @@ package org.gradle.api.file;
  * Visitor which can request a reproducible file order.
  *
  * @since 3.4
+ * 能请求一个可复制的文件顺序
  */
 public interface ReproducibleFileVisitor extends FileVisitor {
     /**

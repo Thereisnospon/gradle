@@ -20,6 +20,7 @@ import java.io.File;
 
 /**
  * An immutable set of directory trees. Intended to be use to efficiently determine whether a particular file is contained in a set of directories or not.
+ * 不可变的 目录树集合。用于高效的判断 目录树中是否存在文件
  */
 public interface FileHierarchySet {
     boolean contains(File file);

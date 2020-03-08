@@ -23,7 +23,7 @@ import org.gradle.util.GFileUtils;
 
 import java.io.File;
 import java.io.InputStream;
-
+//默认DefaultFileTreeElement
 public class DefaultFileTreeElement extends AbstractFileTreeElement {
     private final File file;
     private final RelativePath relativePath;

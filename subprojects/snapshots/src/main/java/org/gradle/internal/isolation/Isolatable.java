@@ -27,6 +27,9 @@ import javax.annotation.Nullable;
  * <p>
  * The primary reason to need such an isolated instance of an object is to ensure that work can be done in parallel using the instance without
  * fear that it's internal state is changing while the work is being carried out.
+ *  从已经创建的 T object 中独立出一个 instance,它与原对象有相同的内部状态
+ *  并且保证不持有 原对象的任何可变状态的引用。
+ *  主要是为了在并行过程中拥有独立的对象
  */
 public interface Isolatable<T> extends Hashable {
     /**

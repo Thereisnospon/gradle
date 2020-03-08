@@ -34,7 +34,7 @@ public abstract class AbstractBaseDirFileResolver extends AbstractFileResolver {
     }
 
     protected abstract File getBaseDir();
-
+    //解析出相对路径
     public String resolveAsRelativePath(Object path) {
         List<String> basePath = Arrays.asList(StringUtils.split(getBaseDir().getAbsolutePath(), "/" + File.separator));
         File targetFile = resolve(path);
@@ -71,7 +71,7 @@ public abstract class AbstractBaseDirFileResolver extends AbstractFileResolver {
         if (file == null) {
             throw new IllegalArgumentException(String.format("Cannot convert path to File. path='%s'", path));
         }
-
+        //如果解析的文件 是相对路径，那么根据当前 baseDir 构造文件
         if (!file.isAbsolute()) {
             File baseDir = getBaseDir();
             if (!GUtil.isTrue(baseDir)) {

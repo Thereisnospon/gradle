@@ -20,15 +20,18 @@ import java.io.File;
 
 /**
  * Resolves some path object to a `File`. May or may not be able to resolve relative paths.
+ * 解析 路径到 File .可能或者不能解析相对路径
  */
 public interface PathToFileResolver {
     /**
      * Resolves the given path to a file.
+     * 解析路径到 File
      */
     File resolve(Object path);
 
     /**
      * Returns a resolver that resolves paths relative to the given base dir.
+     * 根据基准路径 创建一个新的路径解析器
      */
     PathToFileResolver newResolver(File baseDir);
 
@@ -36,6 +39,7 @@ public interface PathToFileResolver {
      * Indicates if this resolver is able to resolved relative paths.
      *
      * @return {@code true} if it can resolve relative path, {@code false} otherwise.
+     * 判断是否能解析相对路径
      */
     boolean canResolveRelativePath();
 }

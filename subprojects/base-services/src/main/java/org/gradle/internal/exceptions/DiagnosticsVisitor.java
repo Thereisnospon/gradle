@@ -16,19 +16,27 @@
 
 package org.gradle.internal.exceptions;
 
+/**
+ * 诊断访问器？
+ * @see  org.gradle.api.internal.file.FileOrUriNotationConverter
+ */
 public interface DiagnosticsVisitor {
     /**
      * Adds the description of some candidate.
+     * 为某个 候选人添加描述？
      */
     DiagnosticsVisitor candidate(String displayName);
 
     /**
      * Adds an example for the previous candidate. Can have multiple examples.
+     *
+     * 添加一个样例
      */
     DiagnosticsVisitor example(String example);
 
     /**
      * Adds a set of potential values for the previous candidate, if known.
+     * 添加一组诊断
      */
     DiagnosticsVisitor values(Iterable<?> values);
 }

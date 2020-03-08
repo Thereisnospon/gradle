@@ -26,6 +26,7 @@ import java.io.File;
 /**
  * FileResolver that uses the file provided to it or constructs one from the toString of the provided object. Used in cases where a FileResolver is needed by the infrastructure, but no base directory
  * can be known.
+ * 没有基准文件的解析器
  */
 public class IdentityFileResolver extends AbstractFileResolver {
     public IdentityFileResolver() {

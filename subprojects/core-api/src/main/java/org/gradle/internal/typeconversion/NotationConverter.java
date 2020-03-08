@@ -22,17 +22,22 @@ import org.gradle.internal.exceptions.DiagnosticsVisitor;
  * A converter from notations of type {@link N} to results of type {@link T}.
  *
  * <p>This interface represents an SPI used to implement notation parsers, not the API to use to perform the conversions. Use {@link NotationParser} instead for this.
+ *FileOrUriNotationConverter
+ * 将  N 类型的符号 转换 成 T 类型的符号
+ * @see  org.gradle.api.internal.file.FileOrUriNotationConverter
  */
 public interface NotationConverter<N, T> {
     /**
      * Attempt to convert the given notation.
      *
      * @throws TypeConversionException when the notation is recognized but cannot be converted for some reason.
+     * 尝试将 给定符号转换，并将结果置入 result
      */
     void convert(N notation, NotationConvertResult<? super T> result) throws TypeConversionException;
 
     /**
      * Describes the formats that this converter accepts.
+     * 描述该 转换器支持的  格式
      */
     void describe(DiagnosticsVisitor visitor);
 }

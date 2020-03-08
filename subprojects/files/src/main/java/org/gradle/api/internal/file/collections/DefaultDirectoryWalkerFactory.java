@@ -24,7 +24,7 @@ import org.gradle.internal.nativeintegration.services.FileSystems;
 import org.gradle.internal.nativeplatform.filesystem.FileSystem;
 
 import java.nio.charset.Charset;
-
+//DirectoryWalker factory
 public class DefaultDirectoryWalkerFactory implements Factory<DirectoryWalker> {
     private final JavaVersion javaVersion;
     private final FileSystem fileSystem;

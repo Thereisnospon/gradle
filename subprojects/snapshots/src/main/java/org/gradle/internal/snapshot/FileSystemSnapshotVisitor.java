@@ -25,6 +25,8 @@ public interface FileSystemSnapshotVisitor {
      * Called before visiting the contents of a directory.
      *
      * @return Whether the subtree should be visited.
+     *
+     * 是否要访问 目录的子树
      */
     boolean preVisitDirectory(DirectorySnapshot directorySnapshot);
 

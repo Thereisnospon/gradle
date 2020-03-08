@@ -31,6 +31,10 @@ import java.util.List;
  * maintaining some or all state in-memory and dealing with concurrent access to the same parts of the file system.
  *
  * Note: use this interface only for those files that are not expected to be changing, for example task inputs.
+ *
+ * 提供访问文件系统 内容和 metadata 的快照
+ * 实现会尝试高效的查询，维持一些或者所有的内存状态 用于在并发访问中 访问部分文件系统
+ * 接口应当在 文件不会被改变时使用，比如 task inputs
  */
 @ThreadSafe
 public interface FileSystemSnapshotter {

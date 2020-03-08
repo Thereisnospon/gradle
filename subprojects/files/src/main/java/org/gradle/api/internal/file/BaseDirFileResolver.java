@@ -24,7 +24,7 @@ import java.io.File;
 
 public class BaseDirFileResolver extends AbstractBaseDirFileResolver {
     private final File baseDir;
-
+    //给定 baseDir
     public BaseDirFileResolver(FileSystem fileSystem, File baseDir, Factory<PatternSet> patternSetFactory) {
         super(fileSystem, patternSetFactory);
         assert baseDir.isAbsolute() : String.format("base dir '%s' is not an absolute file.", baseDir);

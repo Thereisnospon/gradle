@@ -25,6 +25,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * Maintains an in-memory mirror of the state of the filesystem.
  *
  * This is intended to only be used by {@link org.gradle.internal.snapshot.impl.DefaultFileSystemSnapshotter}. Use {@link FileSystemSnapshotter} instead.
+ * 在内存中维护一个文件系统的状态
  */
 @ThreadSafe
 public interface FileSystemMirror {

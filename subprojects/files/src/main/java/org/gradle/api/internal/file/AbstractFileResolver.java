@@ -38,6 +38,7 @@ import java.util.List;
 
 public abstract class AbstractFileResolver implements FileResolver {
     private final FileSystem fileSystem;
+    //文件路径/uri/http 等转换成 File
     private final NotationParser<Object, Object> fileNotationParser;
     private final Factory<PatternSet> patternSetFactory;
 
@@ -52,19 +53,23 @@ public abstract class AbstractFileResolver implements FileResolver {
     }
 
     public FileResolver withBaseDir(Object path) {
+        //先将 path 解析成文件，然后作为基础路径
         return new BaseDirFileResolver(fileSystem, resolve(path), patternSetFactory);
     }
 
     @Override
     public FileResolver newResolver(File baseDir) {
+        //由基准文件夹的解析器
         return new BaseDirFileResolver(fileSystem, baseDir, patternSetFactory);
     }
 
     @Override
     public File resolve(Object path) {
+        //普通解析
         return resolve(path, PathValidation.NONE);
     }
 
+    //转换成 输出类型为 File 的符号解析器
     @Override
     public NotationParser<Object, File> asNotationParser() {
         return new NotationParser<Object, File>() {
@@ -83,10 +88,11 @@ public abstract class AbstractFileResolver implements FileResolver {
 
     @Override
     public File resolve(Object path, PathValidation validation) {
+        //子类解析路径为文件
         File file = doResolve(path);
-
+        //规范化文件比如  /../.
         file = FileUtils.normalize(file);
-
+        //验证文件路径
         validate(file, validation);
 
         return file;
@@ -110,6 +116,7 @@ public abstract class AbstractFileResolver implements FileResolver {
 
     @Nullable
     protected File convertObjectToFile(Object path) {
+        //如果是 Provider，Factory 等先构造出来
         Object object = DeferredUtil.unpack(path);
         if (object == null) {
             return null;
@@ -120,7 +127,7 @@ public abstract class AbstractFileResolver implements FileResolver {
         }
         throw new InvalidUserDataException(String.format("Cannot convert URL '%s' to a file.", converted));
     }
-
+    //验证文件路径
     protected void validate(File file, PathValidation validation) {
         switch (validation) {
             case NONE:
@@ -154,6 +161,7 @@ public abstract class AbstractFileResolver implements FileResolver {
         if (paths.length == 1 && paths[0] instanceof FileCollection) {
             return Cast.cast(FileCollectionInternal.class, paths[0]);
         }
+        //TODO thereisnospon 解析 DefaultConfigurableFileCollection
         return new DefaultConfigurableFileCollection(this, null, paths);
     }
 

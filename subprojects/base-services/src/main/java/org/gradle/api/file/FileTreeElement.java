@@ -21,12 +21,14 @@ import java.io.OutputStream;
 
 /**
  * Information about a file in a {@link FileTree}.
+ * 一个文件在文件树中的信息
  */
 public interface FileTreeElement {
     /**
      * Returns the file being visited.
      *
      * @return The file. Never returns null.
+     * 该文件
      */
     File getFile();
 
@@ -34,6 +36,7 @@ public interface FileTreeElement {
      * Returns true if this element is a directory, or false if this element is a regular file.
      *
      * @return true if this element is a directory.
+     * 该文件是否是目录
      */
     boolean isDirectory();
 
@@ -41,6 +44,7 @@ public interface FileTreeElement {
      * Returns the last modified time of this file at the time of file traversal.
      *
      * @return The last modified time.
+     * 文件遍历中最后的修改时间
      */
     long getLastModified();
 
@@ -48,6 +52,7 @@ public interface FileTreeElement {
      * Returns the size of this file at the time of file traversal.
      *
      * @return The size, in bytes.
+     * 文件遍历时该文件的大学
      */
     long getSize();
 
@@ -56,6 +61,7 @@ public interface FileTreeElement {
      * FileInputStream(getFile())}.
      *
      * @return The input stream. Never returns null. The caller is responsible for closing this stream.
+     * 打开文件的输入流，比普通的 FileInputStream(getFile()) 更高效
      */
     InputStream open();
 
@@ -64,6 +70,7 @@ public interface FileTreeElement {
      * calling {@code new FileInputStream(getFile())}.
      *
      * @param output The output stream to write to. The caller is responsible for closing this stream.
+     * 拷贝文件内容到 output，比new FileInputStream(getFile())更高效
      */
     void copyTo(OutputStream output);
 
@@ -72,6 +79,7 @@ public interface FileTreeElement {
      *
      * @param target the target file.
      * @return true if this file was copied, false if it was up-to-date
+     * 拷贝文件内容到 target，如果目标文件已经是该文件的拷贝，则不会进行实际的拷贝
      */
     boolean copyTo(File target);
 
@@ -79,6 +87,7 @@ public interface FileTreeElement {
      * Returns the base name of this file.
      *
      * @return The name. Never returns null.
+     * 文件 base name
      */
     String getName();
 
@@ -87,6 +96,7 @@ public interface FileTreeElement {
      * separator, regardless of platform file separator. Same as calling <code>getRelativePath().getPathString()</code>.
      *
      * @return The path. Never returns null.
+     * 返回 基于文件树的相对路径。 永远以 '/' 做路径分割符。 与 getRelativePath().getPathString() 类似
      */
     String getPath();
 
@@ -94,6 +104,7 @@ public interface FileTreeElement {
      * Returns the path of this file, relative to the root of the containing file tree.
      *
      * @return The path. Never returns null.
+     * 返回 基于文件树的相对路径
      */
     RelativePath getRelativePath();
 
@@ -101,6 +112,7 @@ public interface FileTreeElement {
      * Returns the Unix permissions of this file, e.g. {@code 0644}.
      *
      * @return The Unix file permissions.
+     * 该文件在 unix 上的权限
      */
     int getMode();
 }

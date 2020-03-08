@@ -46,6 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * A file or directory will only be visited if it matches all includes and no
  * excludes.
+ * 目录文件树，层次遍历节点。 需要匹配 includes excludes 规则才会被 visit
  */
 public class DirectoryFileTree implements MinimalFileTree, PatternFilterableFileTree, RandomAccessFileCollection, LocalFileTree, DirectoryTree {
     private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryFileTree.class);
@@ -121,14 +122,20 @@ public class DirectoryFileTree implements MinimalFileTree, PatternFilterableFile
      * Process the specified file or directory.  If it is a directory, then its contents
      * (but not the directory itself) will be checked with {@link #isAllowed(FileTreeElement, Spec)} and notified to
      * the listener.  If it is a file, the file will be checked and notified.
+     * 处理文件/目录。
+     * 如果是目录，那么它的内容(不包括目录本身） 会被 isAllowed(FileTreeElement, Spec) 检查且通知 listener
+     * 如果是文件，那么文件被检查且通知到 listener
      */
     public void visitFrom(FileVisitor visitor, File fileOrDirectory, RelativePath path) {
         AtomicBoolean stopFlag = new AtomicBoolean();
+        //patternSet 转换成 Spec
         Spec<FileTreeElement> spec = patternSet.getAsSpec();
         if (fileOrDirectory.exists()) {
             if (fileOrDirectory.isFile()) {
+                //单独的文件
                 processSingleFile(fileOrDirectory, visitor, spec, stopFlag);
             } else {
+                //walkDir 递归遍历目录内容
                 walkDir(fileOrDirectory, path, visitor, spec, stopFlag);
             }
         } else {
@@ -139,6 +146,7 @@ public class DirectoryFileTree implements MinimalFileTree, PatternFilterableFile
     private void processSingleFile(File file, FileVisitor visitor, Spec<FileTreeElement> spec, AtomicBoolean stopFlag) {
         RelativePath path = new RelativePath(true, file.getName());
         FileVisitDetails details = new DefaultFileVisitDetails(file, path, stopFlag, fileSystem, fileSystem, false);
+        //处理单独的文件，需要接受规则检查
         if (isAllowed(details, spec)) {
             visitor.visitFile(details);
         }
@@ -160,7 +168,7 @@ public class DirectoryFileTree implements MinimalFileTree, PatternFilterableFile
 
     /**
      * Returns a copy that traverses directories (but not files) in postfix rather than prefix order.
-     *
+     * 拷贝一个深层次优先遍历的 tree
      * @return {@code this}
      */
     public DirectoryFileTree postfix() {

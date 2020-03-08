@@ -26,6 +26,7 @@ import org.gradle.api.internal.file.FileSystemSubset;
  *  <li>{@link LocalFileTree}</li>
  *  <li>{@link PatternFilterableFileTree}</li>
  * </ul>
+ * 最小的文件树 实现。实现可能也会实现上面几个接口
  */
 public interface MinimalFileTree extends MinimalFileCollection {
     /**

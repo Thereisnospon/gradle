@@ -25,6 +25,7 @@ import org.gradle.util.GFileUtils;
 
 import java.io.*;
 
+//抽象FileTreeElement
 public abstract class AbstractFileTreeElement implements FileTreeElement {
     private final Chmod chmod;
 

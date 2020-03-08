@@ -47,6 +47,9 @@ import java.util.Set;
  * </p>
  *
  * <p>The dependencies of this collection are calculated from the result of calling {@link #visitDependencies(TaskDependencyResolveContext)}.</p>
+ *
+ * 包含零个或多个 文件集的并集，并且维持文件的顺序。
+ * 文件集的内容由 调用 visitContents 来收集，并且该方法能被懒加载
  */
 public abstract class CompositeFileCollection extends AbstractFileCollection implements FileCollectionContainer, TaskDependencyContainer {
     @Override
@@ -186,8 +189,10 @@ public abstract class CompositeFileCollection extends AbstractFileCollection imp
         visitContents(fileContext);
     }
 
+    /**每次访问 该文件集内容时 先收集源 文件集的内容（并集，过滤等）*/
     protected List<? extends FileCollectionInternal> getSourceCollections() {
         DefaultFileCollectionResolveContext context = new DefaultFileCollectionResolveContext(new IdentityFileResolver());
+        //访问源 内容
         visitContents(context);
         return context.resolveAsFileCollections();
     }

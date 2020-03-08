@@ -26,6 +26,7 @@ import java.util.Comparator;
  *
  * The snapshot can be a snapshot of a regular file or of a whole directory tree.
  * The file at the location is not required to exist (see {@link MissingFileSnapshot}.
+ * 文件系统中一个 位置的快照。 可以是文件/目录/不存在的一个文件
  */
 public interface FileSystemLocationSnapshot extends FileSystemSnapshot {
 

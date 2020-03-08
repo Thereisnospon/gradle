@@ -62,6 +62,11 @@ public class DefaultFileCollectionResolveContext implements ResolvableFileCollec
         return this;
     }
 
+    /*
+     * 创建一个新的 解析 context, 并且往返回的 context 添加元素 都会被加入到源 context.
+     *  ( 而 newContext() 并不会添加到源 context
+     * 创建的 context 应该用给定的 fileResolver 做解析器，而不是用默认的.
+     */
     @Override
     public FileCollectionResolveContext push(PathToFileResolver fileResolver) {
         ResolvableFileCollectionResolveContext nestedContext = newContext(fileResolver);
@@ -148,9 +153,13 @@ public class DefaultFileCollectionResolveContext implements ResolvableFileCollec
     }
 
     protected interface Converter<T> {
+        /*
+           将 element 转换成 T  类型，添加到 result 中
+         */
         void convertInto(Object element, Collection<? super T> result, PathToFileResolver resolver);
     }
 
+    //转换 Object 到 FileCollectionInternal
     public static class FileCollectionConverter implements Converter<FileCollectionInternal> {
         private final Factory<PatternSet> patternSetFactory;
 
@@ -161,9 +170,11 @@ public class DefaultFileCollectionResolveContext implements ResolvableFileCollec
         public void convertInto(Object element, Collection<? super FileCollectionInternal> result, PathToFileResolver fileResolver) {
             if (element instanceof DefaultFileCollectionResolveContext) {
                 DefaultFileCollectionResolveContext nestedContext = (DefaultFileCollectionResolveContext) element;
+                //递归解析另一个 context (可能是 push 的）的所有 FileCollections
                 result.addAll(nestedContext.resolveAsFileCollections());
             } else if (element instanceof FileCollection) {
                 FileCollection fileCollection = (FileCollection) element;
+                //假设 FileCollection 都是 FileCollectionInternal
                 result.add(Cast.cast(FileCollectionInternal.class, fileCollection));
             } else if (element instanceof MinimalFileTree) {
                 MinimalFileTree fileTree = (MinimalFileTree) element;

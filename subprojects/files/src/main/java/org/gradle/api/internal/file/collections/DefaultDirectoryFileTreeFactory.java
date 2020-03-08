@@ -22,7 +22,7 @@ import org.gradle.internal.nativeintegration.filesystem.FileSystem;
 import org.gradle.internal.nativeintegration.services.FileSystems;
 
 import java.io.File;
-
+//DirectoryFileTree factory
 public class DefaultDirectoryFileTreeFactory implements DirectoryFileTreeFactory {
     private final Factory<PatternSet> patternSetFactory;
     private final FileSystem fileSystem;

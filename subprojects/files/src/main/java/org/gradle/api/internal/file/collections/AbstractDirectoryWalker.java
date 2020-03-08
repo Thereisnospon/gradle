@@ -29,7 +29,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-
+//抽象的文件遍历器
 public abstract class AbstractDirectoryWalker implements DirectoryWalker {
     private final FileSystem fileSystem;
 
@@ -53,22 +53,27 @@ public abstract class AbstractDirectoryWalker implements DirectoryWalker {
             boolean isFile = child.isFile();
             RelativePath childPath = path.append(isFile, child.getName());
             FileVisitDetails details = new DefaultFileVisitDetails(child, childPath, stopFlag, fileSystem, fileSystem, !isFile);
+            //spec.isSatisfiedBy(details)
             if (DirectoryFileTree.isAllowed(details, spec)) {
                 if (isFile) {
                     visitor.visitFile(details);
                 } else {
+                    //先把同一层级的文件访问，目录暂时保存
                     dirs.add(details);
                 }
             }
         }
 
         // now handle dirs
+        //同一层级的文件访问完后，递归访问剩下的目录
         for (int i = 0; !stopFlag.get() && i < dirs.size(); i++) {
             FileVisitDetails dir = dirs.get(i);
             if (postfix) {
+                //先寻找更深层次的再 访问
                 walkDir(dir.getFile(), dir.getRelativePath(), visitor, spec, stopFlag, postfix);
                 visitor.visitDir(dir);
             } else {
+                //先访问 然后寻找更深层次的
                 visitor.visitDir(dir);
                 walkDir(dir.getFile(), dir.getRelativePath(), visitor, spec, stopFlag, postfix);
             }

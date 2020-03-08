@@ -39,18 +39,22 @@ public interface FileCollectionResolveContext {
      *
      * @param element The element to add.
      * @return this
+     * 根据 element 类型递归解析 并将其加入到 该 context
      */
     FileCollectionResolveContext add(Object element);
 
     /**
      * Adds a nested context which resolves elements using the given resolver. Any element added to the returned context will be added to this context. Those elements
      * which need to be resolved using a file resolver will use the provided resolver, instead of the default used by this context.
+     * 创建一个新的 解析 context, 并且往返回的 context 添加元素 都会被加入到源 context.
+     * 创建的 context 应该用给定的 fileResolver 做解析器，而不是用默认的
      */
     FileCollectionResolveContext push(PathToFileResolver fileResolver);
 
     /**
      * Creates a new context which can be used to resolve element. Elements added to the returned context will not be added to this context. Instead, the caller should use
      * one of {@link ResolvableFileCollectionResolveContext#resolveAsFileCollections()} or {@link ResolvableFileCollectionResolveContext#resolveAsFileTrees()}.
+     * 创建一个新的 解析 context, 并且返回的 context 添加元素不会被加入到源 context
      */
     ResolvableFileCollectionResolveContext newContext();
 }

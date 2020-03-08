@@ -19,6 +19,7 @@ import org.gradle.api.tasks.util.PatternFilterable;
 
 /**
  * A file tree which can provide an efficient implementation for filtering using patterns.
+ * 一个能够给提供高效的正则过滤的文件树
  */
 public interface PatternFilterableFileTree extends MinimalFileTree {
     MinimalFileTree filter(PatternFilterable patterns);

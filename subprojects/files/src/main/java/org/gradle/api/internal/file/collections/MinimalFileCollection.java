@@ -22,6 +22,7 @@ package org.gradle.api.internal.file.collections;
  * <li>{@link org.gradle.api.Buildable}</li>
  * <li>{@link RandomAccessFileCollection}</li>
  * </ul>
+ * 最小的文件集合。实现可能 也会实现上面两个
  */
 public interface MinimalFileCollection {
     String getDisplayName();

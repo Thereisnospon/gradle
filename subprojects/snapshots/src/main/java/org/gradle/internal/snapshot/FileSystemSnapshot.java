@@ -18,6 +18,7 @@ package org.gradle.internal.snapshot;
 
 /**
  * A snapshot of a part of the file system.
+ * 文件系统中一个部分的 快照
  */
 public interface FileSystemSnapshot {
     /**

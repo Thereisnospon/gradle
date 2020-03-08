@@ -23,11 +23,13 @@ import java.util.List;
 public interface ResolvableFileCollectionResolveContext extends FileCollectionResolveContext {
     /**
      * Resolves the contents of this context as a sequence of atomic file collections.
+     * 将该 context 的内容解析为 文件集 列表
      */
     List<FileCollectionInternal> resolveAsFileCollections();
 
     /**
      * Resolves the contents of this context as a sequence of atomic file trees.
+     * 将该 context 的内容解析为 文件树 列表
      */
     List<FileTreeInternal> resolveAsFileTrees();
 }

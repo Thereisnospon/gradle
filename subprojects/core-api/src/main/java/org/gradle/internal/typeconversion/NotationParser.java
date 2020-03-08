@@ -21,6 +21,9 @@ import org.gradle.internal.exceptions.DiagnosticsVisitor;
 /**
  * A parser from notations of type {@link N} to a result of type {@link T}. This interface is used by clients to perform the parsing. To implement a parser, you should use {@link NotationConverter}
  * instead.
+ * 一个将 N 类型的符号 解析为 T 类型符号 的解析器
+ * 该接口用于客户端发起解析
+ * @see  org.gradle.api.internal.file.FileOrUriNotationConverter
  */
 public interface NotationParser<N, T> {
     /**
