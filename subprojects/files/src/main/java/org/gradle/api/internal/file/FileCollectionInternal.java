@@ -39,6 +39,8 @@ public interface FileCollectionInternal extends FileCollection {
      * <p>The implementation of this method should not do any work to calculate the files that make up this collection. The visitor may choose to query each element it receives for its elements, or may not.
      *
      * <p>The implementation should call the most specific method on {@link FileCollectionLeafVisitor} that it is able to.</p>
+     *
+     * 在一个 FileCollection 的层级中访问某个层级的 叶子节点。（层次遍历某一层？然后 visitor 选择访问下一层？)
      */
     void visitLeafCollections(FileCollectionLeafVisitor visitor);
 }

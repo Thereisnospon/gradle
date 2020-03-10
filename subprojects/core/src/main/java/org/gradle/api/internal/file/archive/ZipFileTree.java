@@ -61,11 +61,12 @@ public class ZipFileTree implements MinimalFileTree, ArchiveFileTree {
     public String getDisplayName() {
         return String.format("ZIP '%s'", zipFile);
     }
-
+    //调用者有责任 在访问这个 return 方法前 访问这棵树的元素.
+    // 根据父接口 MinimalFileTree 的意思。调用 getMirror（）前需要先 visit 使得 zipEntry 被提取到 getExpandedDir 了
     public DirectoryFileTree getMirror() {
         return directoryFileTreeFactory.create(getExpandedDir());
     }
-
+    //遍历ZipFile 的 ZipEntry,转换成 TreeElement, 当 visitor 需要 element 的 File 时，  提取 ZipEntry 内容到 expandDir,提取出的文件给 visitor
     public void visit(FileVisitor visitor) {
         if (!zipFile.exists()) {
             throw new InvalidUserDataException(String.format("Cannot expand %s as it does not exist.", getDisplayName()));
@@ -113,7 +114,8 @@ public class ZipFileTree implements MinimalFileTree, ArchiveFileTree {
         String expandedDirName = zipFile.getName() + "_" + fileHasher.hash(zipFile);
         return new File(tmpDir, expandedDirName);
     }
-
+    //给定 源zipFile, 给定 解压路径 expandedDir， 需要访问该 TreeElement 时如果 entry 对应的 File 不存在，先从 ZipEntry
+    //拷贝内容到 expandedDir
     private static class DetailsImpl extends AbstractFileTreeElement implements FileVisitDetails {
         private final File originalFile;
         private final File expandedDir;

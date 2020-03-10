@@ -17,7 +17,8 @@ package org.gradle.api.internal.file.collections;
 
 /**
  * A file tree which maintains a local copy of itself on the filesystem.
- * 文件系统中 文件树的拷贝
+ * 文件系统中 文件树的拷贝. 与 zip/tar 紧密相关？？
+ * @see  FileTreeAdapter
  */
 public interface FileSystemMirroringFileTree extends MinimalFileTree {
     /**

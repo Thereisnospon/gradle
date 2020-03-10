@@ -107,11 +107,13 @@ public abstract class AbstractFileTree extends AbstractFileCollection implements
 
     /**
      * Visits all the files of this tree.
+     * 先访问看看有没有内容，如果是 zip/tar 之类的还得先提取内容到本地
      */
     protected boolean visitAll() {
         final MutableBoolean hasContent = new MutableBoolean();
         visit(new FileVisitor() {
             public void visitDir(FileVisitDetails dirDetails) {
+                //如果是 zip/tar 之类的先提取到本地
                 dirDetails.getFile();
                 hasContent.set(true);
             }

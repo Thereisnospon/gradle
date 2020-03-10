@@ -39,6 +39,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * That is, no attention is paid to whether a particular file is a directory, regular file or anything else.
  * Instances do not access the filesystem.
  * TODO thereisnospon
+ * 表示 潜在的文件系统的一个子集
  */
 @ThreadSafe
 public class FileSystemSubset {

@@ -37,6 +37,7 @@ import java.util.Arrays;
 
 /**
  * A {@link SingletonFileTree} which is composed using a mapping from relative path to file source.
+ * 使用文件时 会根据情况选择用 contentWriter 动态写内容到文件
  */
 public class GeneratedSingletonFileTree extends AbstractSingletonFileTree {
     private final Factory<File> tmpDirSource;
@@ -87,6 +88,8 @@ public class GeneratedSingletonFileTree extends AbstractSingletonFileTree {
         return new GeneratedSingletonFileTree(tmpDirSource, fileName, filterPatternSet(patterns), contentWriter);
     }
 
+    //给定 generator，getFile 访问文件时，文件存在且generator 写的内容与当前内容一致就用已有的文件，文件不存在就用
+    //generator 生成的内容写到文件
     private class FileVisitDetailsImpl extends AbstractFileTreeElement implements FileVisitDetails {
         private final String fileName;
         private final Action<OutputStream> generator;

@@ -69,7 +69,9 @@ public class FileTreeAdapter extends AbstractFileTree implements FileCollectionC
     protected Collection<DirectoryFileTree> getAsFileTrees() {
         if (tree instanceof FileSystemMirroringFileTree) {
             FileSystemMirroringFileTree mirroringTree = (FileSystemMirroringFileTree) tree;
+            //先遍历看有没有内容，并且如果是zip/tar 之类的先提取内容到本地
             if (visitAll()) {
+                //FileSystemMirroringFileTree.getMirror 说明了要先 visit 才能 getMirror
                 return Collections.singletonList(mirroringTree.getMirror());
             } else {
                 return Collections.emptyList();

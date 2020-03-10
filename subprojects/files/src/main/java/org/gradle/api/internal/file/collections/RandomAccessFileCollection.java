@@ -19,6 +19,8 @@ import java.io.File;
 
 /**
  * A file collection which can provide an efficient implementation to determine if it contains a given file.
+ * 能高效检查文件是否存在。比如
+ * @see DirectoryFileTree
  */
 public interface RandomAccessFileCollection {
     boolean contains(File file);

@@ -36,5 +36,9 @@ public interface MinimalFileTree extends MinimalFileCollection {
 
     void registerWatchPoints(FileSystemSubset.Builder builder);
 
+    /**
+     * 访问后备文件（zip文件本身）或者 里面的 tree 内容
+     * @param visitor
+     */
     void visitTreeOrBackingFile(FileVisitor visitor);
 }

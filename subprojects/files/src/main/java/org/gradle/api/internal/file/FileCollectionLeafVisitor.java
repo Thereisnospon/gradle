@@ -23,23 +23,28 @@ import java.io.File;
 /**
  * Used with {@link FileCollectionInternal#visitLeafCollections(FileCollectionLeafVisitor)} this visitor
  * gets called for each element in a file collection that represents a root of a file tree.
+ * @see org.gradle.api.internal.file.collections.FileTreeAdapter
  */
 public interface FileCollectionLeafVisitor {
     /**
      * Visits a {@link FileCollectionInternal} element that cannot be visited in further detail.
      * 访问一个 FileCollectionInternal 元素，并且不能访问更多的细节。
+     * @see org.gradle.api.internal.file.collections.FileTreeAdapter
      */
     void visitCollection(FileCollectionInternal fileCollection);
 
     /**
      * Visits a {@link FileTreeInternal} that does not represents a directory in the file system.
-     * 访问一个不在文件系统上以 directory 形式存在的 FileTreeInternal (tar,zip?)
+     * 访问一个不在文件系统上以 directory 形式表示的 FileTreeInternal (tar,zip?)
+     * @see org.gradle.api.internal.file.collections.FileTreeAdapter
      */
     void visitGenericFileTree(FileTreeInternal fileTree);
 
     /**
      * Visits a file tree at a root file on the file system (potentially filtered).
-     * 访问文件系统上 一个 file tree 的根节点
+     * 访问文件系统上 一个 file tree 的根目录，并且提供了定义该目录的过滤规则， visitor 遍历 root File 时可以参考
+     * 过滤规则
+     * @see org.gradle.api.internal.file.collections.FileTreeAdapter
      */
     void visitFileTree(File root, PatternSet patterns);
 }
