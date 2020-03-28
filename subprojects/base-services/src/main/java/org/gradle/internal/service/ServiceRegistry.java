@@ -23,6 +23,7 @@ import java.util.List;
 
 /**
  * A registry of services.
+ * 服务注册相关
  */
 public interface ServiceRegistry {
     /**

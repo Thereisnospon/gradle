@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-
+//打开文件输入流计算文件内容hash
 public class DefaultFileHasher implements FileHasher {
     private final StreamHasher streamHasher;
 

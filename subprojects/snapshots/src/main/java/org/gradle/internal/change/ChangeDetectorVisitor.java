@@ -15,7 +15,7 @@
  */
 
 package org.gradle.internal.change;
-
+//记录至少又一次变动
 public class ChangeDetectorVisitor implements ChangeVisitor {
     private boolean anyChanges;
 

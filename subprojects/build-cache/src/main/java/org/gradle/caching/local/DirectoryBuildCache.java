@@ -49,6 +49,7 @@ public class DirectoryBuildCache extends AbstractBuildCache {
 
     /**
      * Returns the number of days after unused entries are garbage collected. Defaults to 7 days.
+     * 未使用天数标记为清理文件
      *
      * @since 4.6
      */

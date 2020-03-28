@@ -45,17 +45,21 @@ public class DynamicModulesClassPathProvider implements ClassPathProvider {
     }
 
     public ClassPath findClassPath(String name) {
+        //限定了 GRADLE_EXTENSIONS
         if (name.equals("GRADLE_EXTENSIONS")) {
+            //gradle-core classpath.properties 定义的依赖的普通 module
             Set<Module> coreModules = allRequiredModulesOf("gradle-core");
             ClassPath classpath = ClassPath.EMPTY;
             for (String moduleName : GRADLE_EXTENSION_MODULES) {
                 Set<Module> extensionModules = allRequiredModulesOf(moduleName);
+                //需要跟 core 中已有依赖判断
                 classpath = plusExtensionModules(classpath, extensionModules, coreModules);
             }
             for (String moduleName : GRADLE_OPTIONAL_EXTENSION_MODULES) {
                 Set<Module> optionalExtensionModules = allRequiredModulesOfOptional(moduleName);
                 classpath = plusExtensionModules(classpath, optionalExtensionModules, coreModules);
             }
+            //gradle-plugin.properties 和 gradle-implementation-plugin.properties 定义的 插件 module
             for (Module pluginModule : pluginModuleRegistry.getApiModules()) {
                 classpath = classpath.plus(pluginModule.getClasspath());
             }

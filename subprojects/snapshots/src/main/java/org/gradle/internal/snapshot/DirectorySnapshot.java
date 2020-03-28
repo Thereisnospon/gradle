@@ -23,11 +23,19 @@ import java.util.List;
 
 /**
  * A file snapshot which can have children (i.e. a directory).
+ * 有子文件的 文件快照
  */
 public class DirectorySnapshot extends AbstractFileSystemLocationSnapshot implements FileSystemLocationSnapshot {
     private final List<FileSystemLocationSnapshot> children;
     private final HashCode contentHash;
 
+    /**
+     *
+     * @param absolutePath
+     * @param name
+     * @param children
+     * @param contentHash child 的 hash
+     */
     public DirectorySnapshot(String absolutePath, String name, List<FileSystemLocationSnapshot> children, HashCode contentHash) {
         super(absolutePath, name);
         this.children = children;

@@ -19,6 +19,7 @@ package org.gradle.caching.configuration;
 /**
  * Configuration object for a build cache.
  *
+ * build cache 配置类
  * @since 3.5
  */
 public interface BuildCache {

@@ -67,6 +67,9 @@ import java.util.concurrent.atomic.AtomicReference;
  * org.gradle.internal.concurrent.Stoppable} then the appropriate close() or stop() method is called. Instances are closed in reverse dependency order.</p>
  *
  * <p>Service registries are arranged in a hierarchy. If a service of a given type cannot be located, the registry uses its parent registry, if any, to locate the service.</p>
+ *
+ * DefaultServiceRegistry 就是个 轻量级 ioc 管理类，可以进行 service 的注册发现，可以进行依赖注入，
+ * 类似 spring bean 的工厂构建，并且可以根据反射查找类的 createXxx,decorateXxx,configure 等方法自动注册
  */
 public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
     private enum State {INIT, STARTED, CLOSED};
@@ -108,7 +111,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
 
         findProviderMethods(this);
     }
-
+    //构造父provider
     private static ServiceProvider setupParentServices(ServiceRegistry[] parents) {
         ServiceProvider parentServices;
         if (parents.length == 1) {
@@ -154,30 +157,39 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
         return getDisplayName();
     }
 
+
+    //获取 create ,decorate 方法，执行 configure 方法
     private void findProviderMethods(Object target) {
         Class<?> type = target.getClass();
+        //获取 create, decorate, configure 等方法
         RelevantMethods methods = RelevantMethods.getMethods(type);
+        //通过 target 上的 所有  decorators 方法创建 FactoryMethodService
         for (ServiceMethod method : methods.decorators) {
             if (parentServices == null) {
                 throw new ServiceLookupException(String.format("Cannot use decorator method %s.%s() when no parent registry is provided.", type.getSimpleName(), method.getName()));
             }
             ownServices.add(new FactoryMethodService(this, target, method));
         }
+        //通过 target 上的 所有  factories 方法创建 FactoryMethodService
         for (ServiceMethod method : methods.factories) {
             ownServices.add(new FactoryMethodService(this, target, method));
         }
+        //应用 target 上所有的配置 configure 方法
         for (ServiceMethod method : methods.configurers) {
             applyConfigureMethod(method, target);
         }
     }
 
+    //应用 target 上所有的配置 configure 方法
     private void applyConfigureMethod(ServiceMethod method, Object target) {
         Object[] params = new Object[method.getParameterTypes().length];
         for (int i = 0; i < method.getParameterTypes().length; i++) {
             Type paramType = method.getParameterTypes()[i];
+            // configure 方法需要的参数是 ServiceRegistration 类型，就将DefaultServiceRegistry 作为参数
             if (paramType.equals(ServiceRegistration.class)) {
                 params[i] = newRegistration();
             } else {
+                //找到 configure 方法需要参数的 provider 并进行构造参数
                 Service paramProvider = find(paramType, allServices);
                 if (paramProvider == null) {
                     throw new ServiceLookupException(String.format("Cannot configure services using %s.%s() as required service of type %s is not available.",
@@ -284,7 +296,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
         }
         return instance;
     }
-
+    //从 serviceProvider 寻找 serviceType 的 Service
     @Override
     public Object find(Type serviceType) throws ServiceLookupException {
         assertValidServiceType(unwrap(serviceType));
@@ -307,7 +319,9 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
         }
         return factory;
     }
-
+    //获取到 Factory<? extends type>
+    //  或  Factory<? extends type.upbound>
+    //  或  Factory<? extends type.lowerbound>
     private Service getFactoryService(Class<?> serviceType) {
         serviceRequested();
         return allServices.getFactory(serviceType);
@@ -388,6 +402,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
     }
 
     private class OwnServices implements ServiceProvider {
+        //表示 能创建 Class<?> 的所有 ServiceProvider
         private final Map<Class<?>, List<ServiceProvider>> providersByType = new HashMap<Class<?>, List<ServiceProvider>>(16, 0.5f);
         private final CompositeStoppable stoppable = CompositeStoppable.stoppable();
         private ProviderAnalyser analyser = new ProviderAnalyser();
@@ -398,10 +413,12 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             if (serviceProviders.isEmpty()) {
                 return null;
             }
+            //只有一个 Factory 的 provider
             if (serviceProviders.size() == 1) {
                 return serviceProviders.get(0).getFactory(type);
             }
 
+            //拿到所有能 创建 type 的 Factory
             List<Service> services = new ArrayList<Service>(serviceProviders.size());
             for (ServiceProvider serviceProvider : serviceProviders) {
                 Service service = serviceProvider.getFactory(type);
@@ -413,6 +430,8 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             if (services.isEmpty()) {
                 return null;
             }
+
+            //只有一个匹配的 Factory
             if (services.size() == 1) {
                 return services.get(0);
             }
@@ -427,6 +446,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             for (String description : descriptions) {
                 formatter.format("%n   - %s", description);
             }
+            //多个匹配，抛出异常
             throw new ServiceLookupException(formatter.toString());
         }
 
@@ -436,6 +456,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             if (serviceProviders.isEmpty()) {
                 return null;
             }
+            //只有一个 provider
             if (serviceProviders.size() == 1) {
                 return serviceProviders.get(0).getService(type);
             }
@@ -452,6 +473,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
                 return null;
             }
 
+            //只有一个创建的 service
             if (services.size() == 1) {
                 return services.get(0);
             }
@@ -473,7 +495,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             List<ServiceProvider> providers = providersByType.get(type);
             return providers == null ? Collections.<ServiceProvider>emptyList() : providers;
         }
-
+        //收集所有 serviceType 的 Service
         @Override
         public void getAll(Class<?> serviceType, List<Service> result) {
             for (ServiceProvider serviceProvider : getProviders(serviceType)) {
@@ -481,6 +503,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             }
         }
 
+        //全部 stop
         @Override
         public void stop() {
             stoppable.stop();
@@ -488,6 +511,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
 
         public void add(ServiceProvider serviceProvider) {
             assertMutable();
+            //禁止添加非 SingletonService
             if (!(serviceProvider instanceof SingletonService)) {
                 throw new UnsupportedOperationException("Unsupported service provider type: " + serviceProvider);
             }
@@ -498,7 +522,8 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
         public void noLongerMutable() {
             analyser = null;
         }
-
+        //serviceType 及其父类（非 Object），interface 的 class 在 providersByType 中对应
+        //的 List<ServiceProvider> 全都加上 serviceProvider
         private class ProviderAnalyser {
             private Set<Class<?>> seen = new HashSet<Class<?>>(4, 0.5f);
 
@@ -530,22 +555,25 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             }
         }
     }
-
+    //判定此 Class 对象所表示的类或接口与指定的 Class 参数所表示的类或接口是否相同，或是否是其超类或超接口
+    // B extends A . 则 A.class.isAssignableFrom(B.class) 为 true
     private static Class<?> unwrap(Type type) {
         if (type instanceof Class) {
             return (Class) type;
         } else {
             if (type instanceof WildcardType) {
                 final WildcardType wildcardType = (WildcardType) type;
+                //List<? extends XX> XX 就是 getUpperBounds
                 if (wildcardType.getUpperBounds()[0] instanceof Class && wildcardType.getLowerBounds().length == 0) {
                     return (Class<?>) wildcardType.getUpperBounds()[0];
                 }
             }
+            //Map<K ,V> 的 getRawType 是 Map
             ParameterizedType parameterizedType = (ParameterizedType) type;
             return (Class) parameterizedType.getRawType();
         }
     }
-
+    //定义基础的 setInstance，getInstance，requiredBy ，stop 等方法
     private static abstract class ManagedObjectServiceProvider<T> implements ServiceProvider {
         protected final DefaultServiceRegistry owner;
         private final Queue<ServiceProvider> dependents = new ConcurrentLinkedQueue<ServiceProvider>();
@@ -558,7 +586,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
         protected final void setInstance(T instance) {
             this.instance = instance;
         }
-
+        //获取单例
         public final T getInstance() {
             T result = instance;
             if (result == null) {
@@ -579,6 +607,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
         protected abstract T create();
 
         public final void requiredBy(ServiceProvider serviceProvider) {
+            //如果 owner 一致
             if (fromSameRegistry(serviceProvider)) {
                 dependents.add(serviceProvider);
             }
@@ -591,6 +620,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
         public final synchronized void stop() {
             try {
                 if (instance != null) {
+                    //先 stop dependents 再 stop instance
                     CompositeStoppable.stoppable(dependents).add(instance).stop();
                 }
             } finally {
@@ -599,7 +629,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             }
         }
     }
-
+    //定义 prepare，getFactory 等方法
     private static abstract class SingletonService extends ManagedObjectServiceProvider<Object> implements Service {
         private enum BindState {UNBOUND, BINDING, BOUND}
 
@@ -612,6 +642,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
         SingletonService(DefaultServiceRegistry owner, Type serviceType) {
             super(owner);
             this.serviceType = serviceType;
+            //根据泛型等获取 class 信息
             serviceClass = unwrap(serviceType);
         }
 
@@ -656,6 +687,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
 
         @Override
         public Service getService(Type serviceType) {
+            //判断期望的类型得是当前类型的父类/子类
             if (!isSatisfiedBy(serviceType, this.serviceType)) {
                 return null;
             }
@@ -664,6 +696,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
 
         @Override
         public void getAll(Class<?> serviceType, List<Service> result) {
+            //判断期望的类型得是当前类型的父类/子类
             if (serviceType.isAssignableFrom(this.serviceClass)) {
                 result.add(prepare());
             }
@@ -671,18 +704,23 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
 
         @Override
         public Service getFactory(Class<?> elementType) {
+            //判断当前 service 是需要的 elementType 的工厂 service
             if (!isFactory(serviceType, elementType)) {
                 return null;
             }
             return prepare();
         }
 
+        //type 继承/实现 Factory<? extends ElementType>
         private boolean isFactory(Type type, Class<?> elementType) {
             Class c = unwrap(type);
+            //首先得是Factory的子类
             if (!Factory.class.isAssignableFrom(c)) {
                 return false;
             }
+            //缓存当前的 element type
             if (factoryElementType != null) {
+                //需要的 elementType 是当前缓存工厂 factoryElementType 的父类或子类
                 return elementType.isAssignableFrom(factoryElementType);
             }
 
@@ -692,6 +730,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
                 if (parameterizedType.getRawType().equals(Factory.class)) {
                     Type actualType = parameterizedType.getActualTypeArguments()[0];
                     if (actualType instanceof Class) {
+                        //缓存
                         factoryElementType = (Class) actualType;
                         return elementType.isAssignableFrom((Class<?>) actualType);
                     }
@@ -699,6 +738,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             }
 
             // Check if type extends Factory<? extends ElementType>
+            //判断是否实现了 Factory<? extends ElementType> 接口
             for (Type interfaceType : c.getGenericInterfaces()) {
                 if (isFactory(interfaceType, elementType)) {
                     return true;
@@ -708,7 +748,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             return false;
         }
     }
-
+    //根据工厂方法参数类型，找到需要参数的provider进行构造，然后将这些构造的参数传递给工厂方法构建
     private static abstract class FactoryService extends SingletonService {
         private Service[] paramServices;
 
@@ -722,16 +762,23 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
 
         @Override
         protected void bind() {
+            //工厂参数列表
             Type[] parameterTypes = getParameterTypes();
             if (parameterTypes.length == 0) {
                 paramServices = NO_DEPENDENTS;
                 return;
             }
+            //每个参数对应的 service
             paramServices = new Service[parameterTypes.length];
             for (int i = 0; i < parameterTypes.length; i++) {
                 Type paramType = parameterTypes[i];
+                // 参数类型是 ServiceRegistry
                 if (paramType.equals(ServiceRegistry.class)) {
+                    //将 ServiceRegistry 适配成 Service
                     paramServices[i] = owner.getThisAsService();
+                    //参数类型是 要构建的 serviceType 类型，从父类 parentServices 找
+                    //? 因为 factory 要创建 serviceType， 但是参数要求也是 serviceType，
+                    ///所以要从 parentServices 找?
                 } else if (paramType.equals(serviceType)) {
                     Service paramProvider = owner.find(paramType, owner.parentServices);
                     if (paramProvider == null) {
@@ -745,6 +792,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
                 } else {
                     Service paramProvider;
                     try {
+                        //从所有service找
                         paramProvider = owner.find(paramType, owner.allServices);
                     } catch (ServiceLookupException e) {
                         throw new ServiceCreationException(String.format("Cannot create service of type %s using %s.%s() as there is a problem with parameter #%s of type %s.",
@@ -770,7 +818,9 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
 
         @Override
         protected Object create() {
+            //通过 paramProvider 构造 参数
             Object[] params = assembleParameters();
+            //使用构造的参数创建
             Object result = invokeMethod(params);
             // Can discard the state required to create instance
             paramServices = null;
@@ -784,6 +834,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             Object[] params = new Object[paramServices.length];
             for (int i = 0; i < paramServices.length; i++) {
                 Service paramProvider = paramServices[i];
+                //通过 paramProvider 构造 参数
                 params[i] = paramProvider.get();
             }
             return params;
@@ -791,7 +842,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
 
         protected abstract Object invokeMethod(Object[] params);
     }
-
+    // 给定 ServiceMethod(反射Method 或者 MethodHandle) 的工厂
     private class FactoryMethodService extends FactoryService {
         private final ServiceMethod method;
         private Object target;
@@ -840,7 +891,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             }
         }
     }
-
+    //将 ServiceRegistry 适配成 Service
     private Service getThisAsService() {
         return new Service() {
             public String getDisplayName() {
@@ -855,7 +906,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             }
         };
     }
-
+    //只能用初始给的 instance
     private static class FixedInstanceService<T> extends SingletonService {
         public FixedInstanceService(DefaultServiceRegistry owner, Class<T> serviceType, T serviceInstance) {
             super(owner, serviceType);
@@ -909,7 +960,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             return "Service " + format(serviceType);
         }
     }
-
+    //组合 ServiceProvider
     private static class CompositeServiceProvider implements ServiceProvider {
         private final ServiceProvider[] serviceProviders;
 
@@ -962,6 +1013,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
      * delegate is a {@link DefaultServiceRegistry}, in which case it avoids unnecessary object
      * creation and exception handling.
      */
+    //使用父provider get
     private static class ParentServices implements ServiceProvider {
         private final ServiceRegistry parent;
 
@@ -1043,19 +1095,25 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             Type rawType = parameterizedType.getRawType();
             if (rawType.equals(Factory.class)) {
                 final Type typeArg = parameterizedType.getActualTypeArguments()[0];
+                //通过 getFactoryService 获取 Factory<typeArg> 中的 Service
                 return getFactoryService(typeArg, serviceProvider);
             }
             if (rawType instanceof Class) {
                 if (((Class<?>) rawType).isAssignableFrom(List.class)) {
                     Type typeArg = parameterizedType.getActualTypeArguments()[0];
+                    //通过 getCollectionService 获取 List<typeArg> 中的 Service
                     return getCollectionService(typeArg, serviceProvider);
                 }
+                //验证 serviceType 非 array,annotation Object
                 assertValidServiceType((Class<?>) rawType);
+                //直接 serviceProvider.getService
                 return serviceProvider.getService(serviceType);
             }
         }
         if (serviceType instanceof Class<?>) {
+            //验证 serviceType 非 array,annotation Object
             assertValidServiceType((Class<?>) serviceType);
+            //直接 serviceProvider.getService
             return serviceProvider.getService(serviceType);
         }
 
@@ -1064,10 +1122,12 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
 
     private Service getFactoryService(Type type, ServiceProvider serviceProvider) {
         if (type instanceof Class) {
+            //获取 Factory<? extends type>
             return serviceProvider.getFactory((Class) type);
         }
         if (type instanceof WildcardType) {
             final WildcardType wildcardType = (WildcardType) type;
+            //统配符类型 type 是 ? super lowerbound, 获取 Factory<? extends lowerbound>
             if (wildcardType.getLowerBounds().length == 1 && wildcardType.getUpperBounds().length == 1) {
                 if (wildcardType.getLowerBounds()[0] instanceof Class && wildcardType.getUpperBounds()[0].equals(Object.class)) {
                     return serviceProvider.getFactory((Class<?>) wildcardType.getLowerBounds()[0]);
@@ -1075,22 +1135,25 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
             }
             if (wildcardType.getLowerBounds().length == 0 && wildcardType.getUpperBounds().length == 1) {
                 if (wildcardType.getUpperBounds()[0] instanceof Class) {
+                    //通配符类型 type 是 ? etends upbound, 获取到 Factory<? extend upbound>
                     return serviceProvider.getFactory((Class<?>) wildcardType.getUpperBounds()[0]);
                 }
             }
         }
         throw new ServiceValidationException(String.format("Locating services with type %s is not supported.", format(type)));
     }
-
+    //找到 elementType 的 class 的 getCollectionService，或者它的 upbound 的 getCollectionService
     private Service getCollectionService(Type elementType, ServiceProvider serviceProvider) {
         if (elementType instanceof Class) {
             Class<?> elementClass = (Class<?>) elementType;
+            //根据 Class 获取 getCollectionService
             return getCollectionService(elementClass, serviceProvider);
         }
         if (elementType instanceof WildcardType) {
             WildcardType wildcardType = (WildcardType) elementType;
             if (wildcardType.getUpperBounds()[0] instanceof Class && wildcardType.getLowerBounds().length == 0) {
                 Class<?> elementClass = (Class<?>) wildcardType.getUpperBounds()[0];
+                //根据 upbound 的 class 获取 getCollectionService
                 return getCollectionService(elementClass, serviceProvider);
             }
         }
@@ -1098,8 +1161,10 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
     }
 
     private Service getCollectionService(Class<?> elementClass, ServiceProvider serviceProvider) {
+        //验证 serviceType 非 array,annotation Object
         assertValidServiceType(elementClass);
         List<Service> providers = new ArrayList<Service>();
+        //获取所有匹配的 service
         serviceProvider.getAll(elementClass, providers);
         List<Object> services = new ArrayList<Object>(providers.size());
         for (Service service : providers) {
@@ -1107,7 +1172,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
         }
         return new CollectionService(elementClass, services, providers);
     }
-
+    //遍历型
     private static class CollectionService implements Service {
         private final Type typeArg;
         private final List<Object> services;
@@ -1138,9 +1203,11 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
     }
 
     private static boolean isSatisfiedBy(Type expected, Type actual) {
+        //类型相同
         if (expected.equals(actual)) {
             return true;
         }
+        //分类讨论
         if (expected instanceof Class) {
             return isSatisfiedBy((Class<?>) expected, actual);
         }
@@ -1149,30 +1216,36 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
         }
         return false;
     }
-
+    //判断 expectedClass 是 actual 的父类/父接口
     private static boolean isSatisfiedBy(Class<?> expectedClass, Type actual) {
         if (actual instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) actual;
+            //tips:Map<K ,V> 的 getRawType 是 Map
             if (parameterizedType.getRawType() instanceof Class) {
+                //判断 expectedClass 是 actual rawType 的父类或者父接口
                 return expectedClass.isAssignableFrom((Class) parameterizedType.getRawType());
             }
         } else if (actual instanceof Class) {
             Class<?> other = (Class<?>) actual;
+            //判断 expectedClass 是 actual 的父类或者父接口
             return expectedClass.isAssignableFrom(other);
         }
         return false;
     }
 
     private static boolean isSatisfiedBy(ParameterizedType expectedParameterizedType, Type actual) {
+        //tips:Map<K ,V> 的 getRawType 是 Map
         Type expectedRawType = expectedParameterizedType.getRawType();
         if (actual instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) actual;
+            //先判断两个 raw type 是否是父类或父接口
             if (!isSatisfiedBy(expectedRawType, parameterizedType.getRawType())) {
                 return false;
             }
             Type[] expectedTypeArguments = expectedParameterizedType.getActualTypeArguments();
             for (int i = 0; i < parameterizedType.getActualTypeArguments().length; i++) {
                 Type type = parameterizedType.getActualTypeArguments()[i];
+                //判断对应位置上的参数化类型是否是 父类/父接口
                 if (!isSatisfiedBy(expectedTypeArguments[i], type)) {
                     return false;
                 }
@@ -1181,7 +1254,7 @@ public class DefaultServiceRegistry implements ServiceRegistry, Closeable {
         }
         return false;
     }
-
+    // 验证 type 非 array,annotation,Object
     private static void assertValidServiceType(Class<?> serviceClass) {
         if (serviceClass.isArray()) {
             throw new ServiceValidationException("Locating services with array type is not supported.");

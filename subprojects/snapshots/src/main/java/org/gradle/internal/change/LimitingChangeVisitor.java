@@ -15,7 +15,7 @@
  */
 
 package org.gradle.internal.change;
-
+//超过 change 上限了就不继续访问
 public class LimitingChangeVisitor implements ChangeVisitor {
     private final int maxReportedChanges;
     private final ChangeVisitor delegate;

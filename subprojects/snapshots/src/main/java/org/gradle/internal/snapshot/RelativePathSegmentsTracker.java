@@ -24,6 +24,7 @@ import java.util.Deque;
  * Tracks the relative path as an {@link Iterable<String>} when visiting a {@link FileSystemLocationSnapshot}.
  *
  * If you need to keep track of the concatenated relative path use {@link RelativePathStringTracker} instead.
+ * 追踪 访问 FileSystemLocationSnapshot 过程中相对路径的变化
  */
 public class RelativePathSegmentsTracker {
     private final Deque<String> relativePath = Lists.newLinkedList();

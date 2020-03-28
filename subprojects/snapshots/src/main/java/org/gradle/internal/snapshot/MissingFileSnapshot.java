@@ -22,6 +22,7 @@ import org.gradle.internal.hash.Hashing;
 
 /**
  * A snapshot of a missing file.
+ * 丢失文件的快照
  */
 public class MissingFileSnapshot extends AbstractFileSystemLocationSnapshot {
     private static final HashCode SIGNATURE = Hashing.signature(MissingFileSnapshot.class);

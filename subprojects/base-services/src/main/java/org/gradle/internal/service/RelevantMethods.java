@@ -46,6 +46,7 @@ public class RelevantMethods {
     }
 
     public static RelevantMethods getMethods(Class<?> type) {
+        //缓存
         RelevantMethods relevantMethods = METHODS_CACHE.get(type);
         if (relevantMethods == null) {
             relevantMethods = buildRelevantMethods(type);
@@ -64,7 +65,7 @@ public class RelevantMethods {
         relevantMethods = builder.build();
         return relevantMethods;
     }
-
+    //找到 名为 configure 且返回空的 方法
     private static void addConfigureMethods(RelevantMethodsBuilder builder) {
         Class<?> type = builder.type;
         Iterator<Method> iterator = builder.remainingMethods.iterator();
@@ -79,6 +80,7 @@ public class RelevantMethods {
         }
     }
 
+    //找到 create 开头 且返回非 void 的实例方法
     private static void addFactoryMethods(RelevantMethodsBuilder builder) {
         Class<?> type = builder.type;
         Iterator<Method> iterator = builder.remainingMethods.iterator();
@@ -92,7 +94,9 @@ public class RelevantMethods {
             }
         }
     }
-
+    /**
+     找到 create 或者 decorate 开头的，并且有一个参数类型与返回类型相同的 方法
+     */
     private static void addDecoratorMethods(RelevantMethodsBuilder builder) {
         Class<?> type = builder.type;
         Iterator<Method> iterator = builder.remainingMethods.iterator();
@@ -108,7 +112,7 @@ public class RelevantMethods {
             }
         }
     }
-
+    //有个 参数类型等于 返回类型
     private static boolean takesReturnTypeAsParameter(Method method) {
         for (Class<?> param : method.getParameterTypes()) {
             if (param.equals(method.getReturnType())) {

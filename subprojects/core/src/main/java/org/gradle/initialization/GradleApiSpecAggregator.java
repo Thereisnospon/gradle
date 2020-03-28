@@ -67,7 +67,7 @@ class GradleApiSpecAggregator {
         }
         return new DefaultSpec(exportedClasses.build(), exportedPackages.build(), exportedResources.build(), exportedResourcePrefixes.build());
     }
-
+    //找 GradleApiSpecProvider 实现类。（ core 定义的 DefaultGradleApiSpecProvider
     private List<Class<? extends GradleApiSpecProvider>> providers() {
         return new DefaultServiceLocator(classLoader).implementationsOf(GradleApiSpecProvider.class);
     }

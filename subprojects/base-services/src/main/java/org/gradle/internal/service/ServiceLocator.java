@@ -18,6 +18,9 @@ package org.gradle.internal.service;
 import javax.annotation.Nullable;
 import java.util.List;
 
+/**
+ * Service 定位器
+ */
 public interface ServiceLocator {
     <T> T get(Class<T> serviceType) throws UnknownServiceException;
 

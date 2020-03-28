@@ -31,6 +31,7 @@ import java.util.List;
 
 /**
  * Responsible for calculating a {@link FileCollectionFingerprint} for a particular {@link FileCollection}.
+ * 负责计算一个 FileCollection 的 FileCollectionFingerprint
  */
 @NonNullApi
 public abstract class AbstractFileCollectionFingerprinter implements FileCollectionFingerprinter {
@@ -45,6 +46,7 @@ public abstract class AbstractFileCollectionFingerprinter implements FileCollect
     public CurrentFileCollectionFingerprint fingerprint(FileCollection input, FingerprintingStrategy strategy) {
         FileCollectionInternal fileCollection = (FileCollectionInternal) input;
         List<FileSystemSnapshot> roots = fileSystemSnapshotter.snapshot(fileCollection);
+        //通过 snapshot 计算文件指纹
         return DefaultCurrentFileCollectionFingerprint.from(roots, strategy);
     }
 

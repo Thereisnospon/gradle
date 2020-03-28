@@ -23,6 +23,9 @@ import org.gradle.internal.service.ServiceRegistration;
  *
  * <p>Implementations are discovered using the JAR service locator mechanism (see {@link org.gradle.internal.service.ServiceLocator}).
  *
+ * 由插件实现，能给不同 scope 提供 service
+ * 通过 ServiceLocator 发现 在 JAR 包中 的 实现
+ *
  */
 public interface PluginServiceRegistry {
     /**

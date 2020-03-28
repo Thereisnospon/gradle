@@ -34,6 +34,7 @@ public interface FileSystemSnapshot {
      * Walks the whole hierarchy represented by this snapshot.
      *
      * The walk is depth first.
+     * 深度优先遍历 文件系统的 file snapshot
      */
     void accept(FileSystemSnapshotVisitor visitor);
 }

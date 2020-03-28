@@ -66,6 +66,7 @@ class BuildActionsFactory implements CommandLineAction {
         parametersConverter.configure(parser);
     }
 
+    //根据解析的 properties, 命令行参数等 创建 build action
     public Runnable createAction(CommandLineParser parser, ParsedCommandLine commandLine) {
         Parameters parameters = parametersConverter.convert(commandLine, new Parameters());
 
@@ -87,6 +88,7 @@ class BuildActionsFactory implements CommandLineAction {
             return runBuildWithDaemon(parameters.getStartParameter(), parameters.getDaemonParameters(), loggingServices);
         }
         if (canUseCurrentProcess(parameters.getDaemonParameters())) {
+            //在当前进程创建 action
             return runBuildInProcess(parameters.getStartParameter(), parameters.getDaemonParameters(), loggingServices);
         }
 
@@ -123,8 +125,10 @@ class BuildActionsFactory implements CommandLineAction {
     private Runnable runBuildInProcess(StartParameterInternal startParameter, DaemonParameters daemonParameters, ServiceRegistry loggingServices) {
         ServiceRegistry globalServices = ServiceRegistryBuilder.builder()
                 .displayName("Global services")
+                //将 log service 设置为 parent
                 .parent(loggingServices)
                 .parent(NativeServices.getInstance())
+                //全局 service 配置
                 .provider(new GlobalScopeServices(startParameter.isContinuous()))
                 .build();
 

@@ -23,6 +23,7 @@ import org.gradle.internal.snapshot.FileSystemSnapshot;
 
 /**
  * A file collection fingerprint taken during this build.
+ * 一个正在构建的 文件集的 指纹
  */
 public interface CurrentFileCollectionFingerprint extends FileCollectionFingerprint, FileSystemSnapshot {
     /**
@@ -38,6 +39,7 @@ public interface CurrentFileCollectionFingerprint extends FileCollectionFingerpr
      * Visits the changes to file contents since the given fingerprint, subject to the given filters.
      *
      * @return Whether the {@link ChangeVisitor} is looking for further changes. See {@link ChangeVisitor#visitChange(Change)}.
+     * ChangeVisitor 是否正在寻找进一步的变化？
      */
     boolean visitChangesSince(FileCollectionFingerprint oldFingerprint, String title, boolean includeAdded, ChangeVisitor visitor);
 

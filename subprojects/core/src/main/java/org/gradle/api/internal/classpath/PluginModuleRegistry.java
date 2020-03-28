@@ -19,15 +19,19 @@ import java.util.Set;
 
 /**
  * A registry of dynamically loaded plugin modules.
+ * 这里应该是指 core jar 包中 resource(编译生成） 定义的对于 gradle  而言的插件 module 。
+ * 比如 build-cache-http, language-java 等.
  */
 public interface PluginModuleRegistry {
     /**
      * Plugin modules exposed in the Gradle API.
+     * 用于 gradle api 的插件模块. 比如 language-java
      */
     Set<Module> getApiModules();
 
     /**
      * Plugin modules exposed to the Gradle runtime only.
+     * 用于 gradle runtime 的插件模块
      */
     Set<Module> getImplementationModules();
 }

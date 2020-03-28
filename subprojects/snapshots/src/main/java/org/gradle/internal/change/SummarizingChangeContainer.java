@@ -44,7 +44,7 @@ public class SummarizingChangeContainer implements ChangeContainer {
         }
         return true;
     }
-
+    //记录至少有一次变更
     private static class ChangeDetectingVisitor implements ChangeVisitor {
         private final ChangeVisitor delegate;
         private boolean changesDetected;

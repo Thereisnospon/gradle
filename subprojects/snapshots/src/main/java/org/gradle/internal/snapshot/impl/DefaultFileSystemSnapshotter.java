@@ -75,6 +75,7 @@ public class DefaultFileSystemSnapshotter implements FileSystemSnapshotter {
         this.stringInterner = stringInterner;
         this.fileSystem = fileSystem;
         this.fileSystemMirror = fileSystemMirror;
+        //目录快照器
         this.directorySnapshotter = new DirectorySnapshotter(hasher, fileSystem, stringInterner, defaultExcludes);
     }
 
@@ -98,6 +99,7 @@ public class DefaultFileSystemSnapshotter implements FileSystemSnapshotter {
             public HashCode create() {
                 InternableString internableAbsolutePath = new InternableString(absolutePath);
                 FileMetadataSnapshot metadata = statAndCache(internableAbsolutePath, file);
+                //快速判断，metadata 错误
                 if (metadata.getType() != FileType.RegularFile) {
                     return null;
                 }
@@ -180,6 +182,7 @@ public class DefaultFileSystemSnapshotter implements FileSystemSnapshotter {
      *
      * If it turns out that a filtered tree has actually not been filtered (i.e. the condition always returned true),
      * then we cache the result as unfiltered tree.
+     * TODO
      */
     @VisibleForTesting
     FileSystemSnapshot snapshotDirectoryTree(File root, PatternSet patterns) {
@@ -206,6 +209,7 @@ public class DefaultFileSystemSnapshotter implements FileSystemSnapshotter {
 
     private FileSystemSnapshot snapshotFileTree(final FileTreeInternal tree) {
         final FileSystemSnapshotBuilder builder = new FileSystemSnapshotBuilder(stringInterner);
+        //访问 tree
         tree.visitTreeOrBackingFile(new FileVisitor() {
             @Override
             public void visitDir(FileVisitDetails dirDetails) {
@@ -240,6 +244,7 @@ public class DefaultFileSystemSnapshotter implements FileSystemSnapshotter {
 
         @Override
         public void visitCollection(FileCollectionInternal fileCollection) {
+            //可能不是 tree ，需要进一步访问
             for (File file : fileCollection) {
                 roots.add(snapshot(file));
             }
@@ -247,11 +252,13 @@ public class DefaultFileSystemSnapshotter implements FileSystemSnapshotter {
 
         @Override
         public void visitGenericFileTree(FileTreeInternal fileTree) {
+            //可能是个 非 目录型的 tree, 例如 zipTree
             roots.add(snapshotFileTree(fileTree));
         }
 
         @Override
         public void visitFileTree(File root, PatternSet patterns) {
+            //访问文件系统上 一个 file tree 的根目录. 对应 snapshotDirectoryTree
             roots.add(snapshotDirectoryTree(root, patterns));
         }
 

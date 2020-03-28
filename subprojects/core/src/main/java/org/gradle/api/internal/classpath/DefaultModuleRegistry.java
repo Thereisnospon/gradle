@@ -43,6 +43,7 @@ import java.util.zip.ZipFile;
 
 /**
  * Determines the classpath for a module by looking for a '${module}-classpath.properties' resource with 'name' set to the name of the module.
+ * 通过 ${module}-classpath.properties 查找 gradle 安装路径 lib 下的 gradle module 的 ClassPath
  */
 public class DefaultModuleRegistry implements ModuleRegistry, CachedJarFileStore {
     private final GradleInstallation gradleInstallation;

@@ -133,7 +133,7 @@ public class SkipUpToDateStep<C extends Context> implements Step<C, UpToDateResu
             LOGGER.info(formatter.toString());
         }
     }
-
+    //记录最多max条变更信息
     private static class MessageCollectingChangeVisitor implements ChangeVisitor {
         private final ImmutableCollection.Builder<String> messages;
         private final int max;

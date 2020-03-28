@@ -28,6 +28,7 @@ import org.gradle.internal.hash.Hashing;
  * Comparisons are very frequent, so these methods need to be fast.
  *
  * File fingerprints are cached between builds, so their memory footprint should be kept to a minimum.
+ * 文件 metadata 和内容某方面的 指纹信息
  */
 public interface FileSystemLocationFingerprint extends Comparable<FileSystemLocationFingerprint>, Hashable {
     HashCode DIR_SIGNATURE = Hashing.signature("DIR");

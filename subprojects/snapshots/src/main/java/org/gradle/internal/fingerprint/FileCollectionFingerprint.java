@@ -24,16 +24,19 @@ import java.util.Map;
 
 /**
  * An immutable snapshot of some aspects of the contents and meta-data of a collection of files or directories.
+ * 一个文件集 metadata 或者文件内容等方面的 不可变指纹
  */
 public interface FileCollectionFingerprint {
 
     /**
      * The underlying fingerprints.
+     * 底层的指纹集
      */
     Map<String, FileSystemLocationFingerprint> getFingerprints();
 
     /**
      * The Merkle hashes of the roots which make up this file collection fingerprint.
+     * 文件集根节点的 hash
      */
     ImmutableMultimap<String, HashCode> getRootHashes();
 

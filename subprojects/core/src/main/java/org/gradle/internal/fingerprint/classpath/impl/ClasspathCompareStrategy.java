@@ -38,7 +38,7 @@ public class ClasspathCompareStrategy extends AbstractFingerprintCompareStrategy
 
     private ClasspathCompareStrategy() {
     }
-
+    //需要 在同一个位置上(同一个位置(?? 如果 visitor 一直 返回 true 貌似就错位了?)) 一一比较
     @Override
     protected boolean doVisitChangesSince(ChangeVisitor visitor, Map<String, FileSystemLocationFingerprint> currentSnapshots, Map<String, FileSystemLocationFingerprint> previousSnapshots, String propertyTitle, boolean includeAdded) {
         Iterator<Map.Entry<String, FileSystemLocationFingerprint>> currentEntries = currentSnapshots.entrySet().iterator();
@@ -54,6 +54,7 @@ public class ClasspathCompareStrategy extends AbstractFingerprintCompareStrategy
                     String currentNormalizedPath = currentFingerprint.getNormalizedPath();
                     String previousNormalizedPath = previousFingerprint.getNormalizedPath();
                     if (currentNormalizedPath.equals(previousNormalizedPath)) {
+                        //内容不一致, modify
                         if (!currentFingerprint.getNormalizedContentHash().equals(previousFingerprint.getNormalizedContentHash())) {
                             if (!visitor.visitChange(
                                 FileChange.modified(currentAbsolutePath, propertyTitle,
@@ -63,18 +64,25 @@ public class ClasspathCompareStrategy extends AbstractFingerprintCompareStrategy
                                 return false;
                             }
                         }
+                        //内容路径都相同
                     } else {
+                        //路径不一致
                         String previousAbsolutePath = previous.getKey();
+                        //同一个位置(?? 如果 visitor 一直 返回 true 貌似就错位了?)的 current 和 pre 内容不一致. 记录为
+                        // 1. pre 被移除
+                        // 2. current 被添加
                         if (!visitor.visitChange(FileChange.removed(previousAbsolutePath, propertyTitle, previousFingerprint.getType()))) {
                             return false;
                         }
                         if (includeAdded) {
+                            //指定考虑 add的变化
                             if (!visitor.visitChange(FileChange.added(currentAbsolutePath, propertyTitle, currentFingerprint.getType()))) {
                                 return false;
                             }
                         }
                     }
                 } else {
+                    //同一个位置(?? 如果 visitor 一直 返回 true 貌似就错位了?) 的 current 有，而 pre 没有。那么 current 被add了
                     if (includeAdded) {
                         if (!visitor.visitChange(FileChange.added(currentAbsolutePath, propertyTitle, current.getValue().getType()))) {
                             return false;
@@ -82,6 +90,7 @@ public class ClasspathCompareStrategy extends AbstractFingerprintCompareStrategy
                     }
                 }
             } else {
+                //当前文件遍历结束，如果原来的还有，那么 pre 都被移除了
                 if (previousEntries.hasNext()) {
                     Map.Entry<String, FileSystemLocationFingerprint> previousEntry = previousEntries.next();
                     if (!visitor.visitChange(FileChange.removed(previousEntry.getKey(), propertyTitle, previousEntry.getValue().getType()))) {
@@ -96,6 +105,7 @@ public class ClasspathCompareStrategy extends AbstractFingerprintCompareStrategy
 
     @Override
     public void appendToHasher(Hasher hasher, Collection<FileSystemLocationFingerprint> fingerprints) {
+        //TODO 。这里貌似没有排序后进行 计算
         for (FileSystemLocationFingerprint fingerprint : fingerprints) {
             fingerprint.appendToHasher(hasher);
         }

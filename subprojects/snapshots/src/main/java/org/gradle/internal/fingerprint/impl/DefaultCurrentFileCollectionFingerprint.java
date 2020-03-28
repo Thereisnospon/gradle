@@ -47,7 +47,9 @@ public class DefaultCurrentFileCollectionFingerprint implements CurrentFileColle
         if (Iterables.isEmpty(roots)) {
             return strategy.getEmptyFingerprint();
         }
+        //按照给定策略收集 fingerprint
         Map<String, FileSystemLocationFingerprint> snapshots = strategy.collectFingerprints(roots);
+        //root 都为空就不需要继续了
         if (snapshots.isEmpty()) {
             return strategy.getEmptyFingerprint();
         }
@@ -65,11 +67,13 @@ public class DefaultCurrentFileCollectionFingerprint implements CurrentFileColle
             @Override
             public boolean preVisitDirectory(DirectorySnapshot directorySnapshot) {
                 builder.put(directorySnapshot.getAbsolutePath(), directorySnapshot.getHash());
+                //只访问 root 文件 和 root 目录，所以 root dir 继续 访问
                 return false;
             }
 
             @Override
             public void visit(FileSystemLocationSnapshot fileSnapshot) {
+                //只访问 root 文件 和 root 目录
                 builder.put(fileSnapshot.getAbsolutePath(), fileSnapshot.getHash());
             }
 
@@ -77,6 +81,7 @@ public class DefaultCurrentFileCollectionFingerprint implements CurrentFileColle
             public void postVisitDirectory(DirectorySnapshot directorySnapshot) {
             }
         });
+        //root hash 计算
         this.rootHashes = builder.build();
     }
 
@@ -128,6 +133,7 @@ public class DefaultCurrentFileCollectionFingerprint implements CurrentFileColle
         if (roots == null) {
             throw new UnsupportedOperationException("Roots not available.");
         }
+        //从 所有跟节点开始深度优先遍历 file snapshot
         for (FileSystemSnapshot root : roots) {
             root.accept(visitor);
         }

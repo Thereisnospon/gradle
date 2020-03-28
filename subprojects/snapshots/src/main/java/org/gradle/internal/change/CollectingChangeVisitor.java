@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * 仅仅只是收集所有 Change 而已
+ */
 public class CollectingChangeVisitor implements ChangeVisitor {
     private List<Change> changes = new ArrayList<Change>();
 

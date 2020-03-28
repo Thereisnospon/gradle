@@ -30,6 +30,7 @@ import java.util.Map;
 
 /**
  * Fingerprint files without path or content normalization.
+ * 没有进行路径或内容标准化的 文件指纹策略？
  */
 public class AbsolutePathFingerprintingStrategy extends AbstractFingerprintingStrategy {
     public static final FingerprintingStrategy INCLUDE_MISSING = new AbsolutePathFingerprintingStrategy(true);
@@ -52,18 +53,22 @@ public class AbsolutePathFingerprintingStrategy extends AbstractFingerprintingSt
                 @Override
                 public boolean preVisitDirectory(DirectorySnapshot directorySnapshot) {
                     String absolutePath = directorySnapshot.getAbsolutePath();
+                    //同一个绝对路径值添加一次
                     if (processedEntries.add(absolutePath)) {
                         builder.put(absolutePath, new DefaultFileSystemLocationFingerprint(directorySnapshot.getAbsolutePath(), directorySnapshot));
                     }
+                    //遍历所有文件夹的子文件
                     return true;
                 }
 
                 @Override
                 public void visit(FileSystemLocationSnapshot fileSnapshot) {
+                    //给定不考虑 missing
                     if (!includeMissing && fileSnapshot.getType() == FileType.Missing) {
                         return;
                     }
                     String absolutePath = fileSnapshot.getAbsolutePath();
+                    //同一个绝对路径值添加一次
                     if (processedEntries.add(absolutePath)) {
                         builder.put(absolutePath, new DefaultFileSystemLocationFingerprint(fileSnapshot.getAbsolutePath(), fileSnapshot));
                     }

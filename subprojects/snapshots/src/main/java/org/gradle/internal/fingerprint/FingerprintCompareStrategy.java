@@ -26,6 +26,8 @@ import java.util.Map;
  * Strategy to compare two {@link FileCollectionFingerprint}s.
  *
  * The strategy first tries to do a trivial comparison and delegates the more complex cases to a separate implementation.
+ * 用于比较 两个 FileCollectionFingerprint 的策略。
+ * 策略首先 尝试进行 简单的比较，然后委托更复杂的实现。
  */
 public interface FingerprintCompareStrategy {
     /**

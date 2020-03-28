@@ -27,6 +27,7 @@ public class DefaultClassLoaderRegistry implements ClassLoaderRegistry {
     public DefaultClassLoaderRegistry(ClassPathRegistry classPathRegistry, LegacyTypesSupport legacyTypesSupport) {
         ClassLoader runtimeClassLoader = getClass().getClassLoader();
         this.apiOnlyClassLoader = restrictToGradleApi(runtimeClassLoader);
+        //MixIn
         this.pluginsClassLoader = new MixInLegacyTypesClassLoader(runtimeClassLoader, classPathRegistry.getClassPath("GRADLE_EXTENSIONS"), legacyTypesSupport);
         this.apiAndPluginsClassLoader = restrictToGradleApi(pluginsClassLoader);
     }
@@ -41,6 +42,7 @@ public class DefaultClassLoaderRegistry implements ClassLoaderRegistry {
 
     private static FilteringClassLoader.Spec apiSpecFor(ClassLoader classLoader) {
         FilteringClassLoader.Spec apiSpec = new FilteringClassLoader.Spec();
+        //DefaultGradleApiSpecProvider
         GradleApiSpecProvider.Spec apiAggregate = new GradleApiSpecAggregator(classLoader).aggregate();
         for (String resource : apiAggregate.getExportedResources()) {
             apiSpec.allowResource(resource);

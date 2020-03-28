@@ -33,6 +33,7 @@ import java.util.Map;
 
 /**
  * Compares by normalized path (relative/name only) and file contents. Order does not matter.
+ * TODO doVisitChangesSince 没看明白
  */
 public class NormalizedPathFingerprintCompareStrategy extends AbstractFingerprintCompareStrategy {
     public static final FingerprintCompareStrategy INSTANCE = new NormalizedPathFingerprintCompareStrategy();
@@ -85,6 +86,7 @@ public class NormalizedPathFingerprintCompareStrategy extends AbstractFingerprin
             FileSystemLocationFingerprint previousFingerprint = unaccountedForPreviousFingerprintEntry.getKey();
             String normalizedPath = previousFingerprint.getNormalizedPath();
             List<FilePathWithType> addedFilesForNormalizedPath = addedFilesByNormalizedPath.get(normalizedPath);
+
             if (!addedFilesForNormalizedPath.isEmpty()) {
                 // There might be multiple files with the same normalized path, here we choose one of them
                 FilePathWithType addedFile = addedFilesForNormalizedPath.remove(0);
@@ -114,6 +116,9 @@ public class NormalizedPathFingerprintCompareStrategy extends AbstractFingerprin
         appendSortedToHasher(hasher, fingerprints);
     }
 
+    /**
+     * 先排序再 计算 hash
+     */
     public static void appendSortedToHasher(Hasher hasher, Collection<FileSystemLocationFingerprint> fingerprints) {
         List<FileSystemLocationFingerprint> sortedFingerprints = Lists.newArrayList(fingerprints);
         Collections.sort(sortedFingerprints);

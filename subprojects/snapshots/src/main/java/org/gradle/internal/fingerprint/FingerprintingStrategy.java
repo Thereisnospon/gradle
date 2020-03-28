@@ -24,11 +24,13 @@ import java.util.Map;
 
 /**
  * Strategy for converting a sequence of {@link FileSystemLocationSnapshot}s into a {@link FileCollectionFingerprint}.
+ * 将 一串 FileSystemLocationSnapshot 转换为 FileCollectionFingerprint 的策略
  */
 public interface FingerprintingStrategy {
 
     /**
      * Converts the roots into the {@link FileSystemLocationFingerprint}s used by the {@link FileCollectionFingerprint}.
+     * 将 root FileCollectionFingerprint 转换为  FileSystemLocationFingerprint
      */
     Map<String, FileSystemLocationFingerprint> collectFingerprints(Iterable<FileSystemSnapshot> roots);
 

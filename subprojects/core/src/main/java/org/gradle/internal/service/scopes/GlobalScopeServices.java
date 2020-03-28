@@ -154,6 +154,7 @@ public class GlobalScopeServices extends BasicGlobalScopeServices {
     }
 
     void configure(ServiceRegistration registration, ClassLoaderRegistry classLoaderRegistry) {
+        //找到所有 plugin module ，注册 pluginServiceRegistry 本身，然后调用它们的 registerGlobalServices
         final List<PluginServiceRegistry> pluginServiceFactories = new DefaultServiceLocator(classLoaderRegistry.getRuntimeClassLoader(), classLoaderRegistry.getPluginsClassLoader()).getAll(PluginServiceRegistry.class);
         for (PluginServiceRegistry pluginServiceRegistry : pluginServiceFactories) {
             registration.add(PluginServiceRegistry.class, pluginServiceRegistry);
@@ -185,6 +186,7 @@ public class GlobalScopeServices extends BasicGlobalScopeServices {
         return new DefaultCommandLineConverter();
     }
 
+    //组合 gradle 普通 module 和 插件 module 的 ClassPathRegistry
     ClassPathRegistry createClassPathRegistry(ModuleRegistry moduleRegistry, PluginModuleRegistry pluginModuleRegistry) {
         return new DefaultClassPathRegistry(
             new DefaultClassPathProvider(moduleRegistry),
@@ -192,10 +194,13 @@ public class GlobalScopeServices extends BasicGlobalScopeServices {
                 pluginModuleRegistry));
     }
 
+   //see this::createCurrentGradleInstallation
+    //查找 gradle 安装路径 lib 中 gradle 的 module classPath
     DefaultModuleRegistry createModuleRegistry(CurrentGradleInstallation currentGradleInstallation) {
         return new DefaultModuleRegistry(additionalModuleClassPath, currentGradleInstallation.getInstallation());
     }
 
+    //找到当前执行 gradle 的安装路径
     CurrentGradleInstallation createCurrentGradleInstallation() {
         return CurrentGradleInstallation.locate();
     }
@@ -207,7 +212,7 @@ public class GlobalScopeServices extends BasicGlobalScopeServices {
     protected CacheFactory createCacheFactory(FileLockManager fileLockManager, ExecutorFactory executorFactory, ProgressLoggerFactory progressLoggerFactory) {
         return new DefaultCacheFactory(fileLockManager, executorFactory, progressLoggerFactory);
     }
-
+    //ClassLoader 注册信息
     ClassLoaderRegistry createClassLoaderRegistry(ClassPathRegistry classPathRegistry, LegacyTypesSupport legacyTypesSupport) {
         if (GradleRuntimeShadedJarDetector.isLoadedFrom(getClass())) {
             return new FlatClassLoaderRegistry(getClass().getClassLoader());

@@ -15,7 +15,7 @@
  */
 
 package org.gradle.internal.snapshot;
-
+//default
 public abstract class AbstractFileSystemLocationSnapshot implements FileSystemLocationSnapshot {
     private final String absolutePath;
     private final String name;

@@ -30,6 +30,7 @@ import java.util.Set;
 
 /**
  * Compares by absolute paths and file contents. Order does not matter.
+ * 比较绝对路径和文件内容， 不关心文件顺序
  */
 public class AbsolutePathFingerprintCompareStrategy extends AbstractFingerprintCompareStrategy {
 
@@ -46,22 +47,26 @@ public class AbsolutePathFingerprintCompareStrategy extends AbstractFingerprintC
             String currentAbsolutePath = currentEntry.getKey();
             FileSystemLocationFingerprint currentFingerprint = currentEntry.getValue();
             HashCode currentContentHash = currentFingerprint.getNormalizedContentHash();
+            //原先有currentAbsolutePath 并且移除记录
             if (unaccountedForPreviousFingerprints.remove(currentAbsolutePath)) {
                 FileSystemLocationFingerprint previousFingerprint = previous.get(currentAbsolutePath);
                 HashCode previousContentHash = previousFingerprint.getNormalizedContentHash();
                 if (!currentContentHash.equals(previousContentHash)) {
+                    //原文件与现文件hash不同， modify change
                     if (!visitor.visitChange(FileChange.modified(currentAbsolutePath, propertyTitle, previousFingerprint.getType(), currentFingerprint.getType()))) {
                         return false;
                     }
                 }
+                //hash 相同，不需要处理
                 // else, unchanged; check next file
             } else if (includeAdded) {
+                //原来没有该文件，那么该文件是被 add 的。（只有在需要坚持 add 的时候调用
                 if (!visitor.visitChange(FileChange.added(currentAbsolutePath, propertyTitle, currentFingerprint.getType()))) {
                     return false;
                 }
             }
         }
-
+        //原来文件 在现在还有的都被移除了，剩下的内容时现在没有的，都是 remove 的 change
         for (String previousAbsolutePath : unaccountedForPreviousFingerprints) {
             if (!visitor.visitChange(FileChange.removed(previousAbsolutePath, propertyTitle, previous.get(previousAbsolutePath).getType()))) {
                 return false;
@@ -72,6 +77,7 @@ public class AbsolutePathFingerprintCompareStrategy extends AbstractFingerprintC
 
     @Override
     public void appendToHasher(Hasher hasher, Collection<FileSystemLocationFingerprint> fingerprints) {
+        //先排序再计算hash
         NormalizedPathFingerprintCompareStrategy.appendSortedToHasher(hasher, fingerprints);
     }
 }

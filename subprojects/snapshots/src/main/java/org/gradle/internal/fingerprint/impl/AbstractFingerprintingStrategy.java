@@ -19,7 +19,7 @@ package org.gradle.internal.fingerprint.impl;
 import org.gradle.internal.fingerprint.CurrentFileCollectionFingerprint;
 import org.gradle.internal.fingerprint.FingerprintCompareStrategy;
 import org.gradle.internal.fingerprint.FingerprintingStrategy;
-
+//default
 public abstract class AbstractFingerprintingStrategy implements FingerprintingStrategy {
     private final String identifier;
     private final FingerprintCompareStrategy compareStrategy;

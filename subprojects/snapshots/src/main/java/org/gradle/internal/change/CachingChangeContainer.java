@@ -54,7 +54,7 @@ public class CachingChangeContainer implements ChangeContainer {
         cached = acceptedAllChanges && !overrun;
         return acceptedAllChanges;
     }
-
+    //超限就清零重新记录change
     private class CachingVisitor implements ChangeVisitor {
         private final ChangeVisitor delegate;
         private int numChanges;

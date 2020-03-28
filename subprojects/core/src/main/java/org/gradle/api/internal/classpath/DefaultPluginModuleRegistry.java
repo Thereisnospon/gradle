@@ -31,6 +31,7 @@ public class DefaultPluginModuleRegistry implements PluginModuleRegistry {
         this.moduleRegistry = moduleRegistry;
     }
 
+    //查找 core 中定义的插件 module
     @Override
     public Set<Module> getApiModules() {
         Properties properties = loadPluginProperties("/gradle-plugins.properties");
@@ -57,6 +58,7 @@ public class DefaultPluginModuleRegistry implements PluginModuleRegistry {
     }
 
     private Properties loadPluginProperties(String resource) {
+        //查找 core jar 中指定的插件模块，而当前类是 core 中的。利用当前类的 classLoader 定位资源
         return GUtil.loadProperties(getClass().getResource(resource));
     }
 }

@@ -35,6 +35,7 @@ import java.net.URL;
  * E.g. we treat authentication failures (401 and 409) as non-recoverable while an internal server error (500) is recoverable.
  *
  * @since 3.5
+ * 远程 cache
  */
 public class HttpBuildCache extends AbstractBuildCache {
     private final HttpBuildCacheCredentials credentials;
@@ -76,6 +77,7 @@ public class HttpBuildCache extends AbstractBuildCache {
 
     /**
      * Returns the credentials used to access the HTTP cache backend.
+     * 认证信息
      */
     public HttpBuildCacheCredentials getCredentials() {
         return credentials;

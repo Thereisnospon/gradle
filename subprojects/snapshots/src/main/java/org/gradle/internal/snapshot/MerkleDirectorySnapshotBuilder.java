@@ -27,15 +27,19 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 
+/**
+ * 按目录层级计算 目录 hash
+ */
 public class MerkleDirectorySnapshotBuilder implements FileSystemSnapshotVisitor {
     private static final HashCode DIR_SIGNATURE = Hashing.signature("DIR");
-
+    //TODO 为啥要用 relativePathSegmentsTracker 判断 root ?
     private final RelativePathSegmentsTracker relativePathSegmentsTracker = new RelativePathSegmentsTracker();
+    //按照目录由上到下 的层级记录没一层目录的子文件 snapshot
     private final Deque<List<FileSystemLocationSnapshot>> levelHolder = new ArrayDeque<List<FileSystemLocationSnapshot>>();
     private final Deque<String> directoryAbsolutePaths = new ArrayDeque<String>();
     private final boolean sortingRequired;
     private FileSystemLocationSnapshot result;
-
+    //计算 content hash (child) 时需要排序
     public static MerkleDirectorySnapshotBuilder sortingRequired() {
         return new MerkleDirectorySnapshotBuilder(true);
     }
@@ -80,6 +84,7 @@ public class MerkleDirectorySnapshotBuilder implements FileSystemSnapshotVisitor
 
     public boolean postVisitDirectory(boolean includeEmpty) {
         String name = relativePathSegmentsTracker.leave();
+        //该目录对应那一层的被移除
         List<FileSystemLocationSnapshot> children = levelHolder.removeLast();
         String absolutePath = directoryAbsolutePaths.removeLast();
         if (children.isEmpty() && !includeEmpty) {
@@ -89,16 +94,23 @@ public class MerkleDirectorySnapshotBuilder implements FileSystemSnapshotVisitor
             Collections.sort(children, FileSystemLocationSnapshot.BY_NAME);
         }
         Hasher hasher = Hashing.newHasher();
+        //这里如果是空目录的话 也会被计算 hash. 如果是
+        //1. a/b  b 为空目录
+        //2. c/
+        //3. 那么 a 的 hash 计算与 c 不同？
         hasher.putHash(DIR_SIGNATURE);
         for (FileSystemLocationSnapshot child : children) {
             hasher.putString(child.getName());
             hasher.putHash(child.getHash());
         }
         DirectorySnapshot directorySnapshot = new DirectorySnapshot(absolutePath, name, children, hasher.hash());
+        //该目录对应一层的被移除了，那么 last 是该目录父目录的 子文件列表，也就是它的兄弟列表
         List<FileSystemLocationSnapshot> siblings = levelHolder.peekLast();
         if (siblings != null) {
+            //有兄弟列表，那么说明不是 root ，那么将自己的 snapshot 加入到兄弟列表
             siblings.add(directorySnapshot);
         } else {
+            //root 节点的
             result = directorySnapshot;
         }
         return true;

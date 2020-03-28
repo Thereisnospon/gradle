@@ -21,6 +21,7 @@ public interface ChangeVisitor {
      * Visits a new change.
      *
      * @return Whether to continue looking for changes.
+     * 是否继续检查 change
      */
     boolean visitChange(Change change);
 }

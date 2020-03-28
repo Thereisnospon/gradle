@@ -34,6 +34,7 @@ import java.util.Set;
 
 /**
  * Uses the Jar service resource specification to locate service implementations.
+ * 使用 jar 定位 service 实现类
  */
 public class DefaultServiceLocator implements ServiceLocator {
     private final List<ClassLoader> classLoaders;
@@ -102,7 +103,7 @@ public class DefaultServiceLocator implements ServiceLocator {
         }
         return factories;
     }
-
+    //找到 serviceType 的实现类
     private <T> List<Class<? extends T>> findServiceImplementations(Class<T> serviceType) throws IOException {
         String resourceName = "META-INF/services/" + serviceType.getName();
         Set<String> implementationClassNames = new HashSet<String>();
@@ -113,6 +114,7 @@ public class DefaultServiceLocator implements ServiceLocator {
                 URL resource = resources.nextElement();
                 List<String> implementationClassNamesFromResource;
                 try {
+                    //读取 service 资源每行内容
                     implementationClassNamesFromResource = extractImplementationClassNames(resource);
                     if (implementationClassNamesFromResource.isEmpty()) {
                         throw new RuntimeException(String.format("No implementation class for service '%s' specified.", serviceType.getName()));
@@ -122,8 +124,10 @@ public class DefaultServiceLocator implements ServiceLocator {
                 }
 
                 for (String implementationClassName : implementationClassNamesFromResource) {
+                    //去重判断
                     if (implementationClassNames.add(implementationClassName)) {
                         try {
+                            //在哪个 jar 找到资源就从哪个 jar 加载类
                             Class<?> implClass = classLoader.loadClass(implementationClassName);
                             if (!serviceType.isAssignableFrom(implClass)) {
                                 throw new RuntimeException(String.format("Implementation class '%s' is not assignable to service class '%s'.", implementationClassName, serviceType.getName()));
@@ -138,7 +142,7 @@ public class DefaultServiceLocator implements ServiceLocator {
         }
         return implementations;
     }
-
+    //读取每行
     private List<String> extractImplementationClassNames(URL resource) throws IOException {
         InputStream inputStream = resource.openStream();
         try {

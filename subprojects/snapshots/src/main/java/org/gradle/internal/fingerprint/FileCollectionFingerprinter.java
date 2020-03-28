@@ -21,16 +21,19 @@ import org.gradle.api.tasks.FileNormalizer;
 public interface FileCollectionFingerprinter {
     /**
      * The type used to refer to this fingerprinter in the {@link FileCollectionFingerprinterRegistry}.
+     * 用于在 FileCollectionFingerprinterRegistry 中注册用的 type
      */
     Class<? extends FileNormalizer> getRegisteredType();
 
     /**
      * Creates a fingerprint of the contents of the given collection.
+     * 给文件集的内容创建指纹
      */
     CurrentFileCollectionFingerprint fingerprint(FileCollection files);
 
     /**
      * Returns an empty fingerprint.
+     * 创建空的文件集指纹
      */
     CurrentFileCollectionFingerprint empty();
 }

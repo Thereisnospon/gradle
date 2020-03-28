@@ -17,7 +17,7 @@ package org.gradle.internal.service;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-
+//对 method-handle // 反射的封装
 public interface ServiceMethod {
     Class<?> getOwner();
 

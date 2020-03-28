@@ -20,6 +20,7 @@ package org.gradle.caching.configuration;
  * Base implementation for build cache service configuration.
  *
  * @since 3.5
+ * abs
  */
 public abstract class AbstractBuildCache implements BuildCache {
     private boolean enabled = true;

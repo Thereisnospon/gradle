@@ -19,7 +19,7 @@ import org.gradle.internal.UncheckedException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-
+//尝试使用 method-handle 特性。否则使用 反射
 class MethodHandleBasedServiceMethodFactory implements ServiceMethodFactory {
 
     public MethodHandleBasedServiceMethodFactory() {

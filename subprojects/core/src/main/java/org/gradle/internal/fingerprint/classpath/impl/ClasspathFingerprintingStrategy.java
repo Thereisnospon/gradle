@@ -60,6 +60,10 @@ import static org.gradle.internal.fingerprint.classpath.impl.ClasspathFingerprin
  * The order of the entries in the classpath matters, paths do not matter for the entries.
  * For the resources in each classpath entry, normalization takes the relative path of the resource and possibly normalizes its contents.
  * </p>
+ * 与 classpath 类似的 文件集 指纹策略
+ * 该策略使用 ResourceHasher 标准话 文件内容，并且使用 ResourceFilter 规则 忽略 某些 classpath 中的资源，jar 文件中的内容在其被解压到磁盘后检查
+ * classpath 的 顺序非常重要，但是路径并不重要。
+ * 在 classpath 中的 resource entry 会用资源的相对路径标准化，并且可能标准化内容
  */
 public class ClasspathFingerprintingStrategy extends AbstractFingerprintingStrategy {
 

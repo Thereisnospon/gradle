@@ -71,10 +71,12 @@ public class DirectorySnapshotter {
 
     public FileSystemLocationSnapshot snapshot(String absolutePath, @Nullable PatternSet patterns, final MutableBoolean hasBeenFiltered) {
         Path rootPath = Paths.get(absolutePath);
+        //过滤规则
         final Spec<FileTreeElement> spec = (patterns == null || patterns.isEmpty()) ? null : patterns.getAsSpec();
         final MerkleDirectorySnapshotBuilder builder = MerkleDirectorySnapshotBuilder.sortingRequired();
 
         try {
+            //需要跟踪软链接
             Files.walkFileTree(rootPath, EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, new java.nio.file.FileVisitor<Path>() {
                 @Override
                 public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
@@ -96,6 +98,7 @@ public class DirectorySnapshotter {
                         }
                         if (attrs.isSymbolicLink()) {
                             // when FileVisitOption.FOLLOW_LINKS, we only get here when link couldn't be followed
+                            //当给了 when FileVisitOption.FOLLOW_LINKS， 走到这里说明 link 无法被继续追踪
                             throw new GradleException(String.format("Could not list contents of '%s'. Couldn't follow symbolic link.", file));
                         }
                         addFileSnapshot(file, name, attrs);
@@ -133,7 +136,9 @@ public class DirectorySnapshotter {
                 private void addFileSnapshot(Path file, String name, BasicFileAttributes attrs) {
                     Preconditions.checkNotNull(attrs, "Unauthorized access to %", file);
                     DefaultFileMetadata metadata = new DefaultFileMetadata(FileType.RegularFile, attrs.lastModifiedTime().toMillis(), attrs.size());
+                    //普通文件 hash 计算
                     HashCode hash = hasher.hash(file.toFile(), metadata);
+                    //普通文件的 快照
                     RegularFileSnapshot fileSnapshot = new RegularFileSnapshot(internedAbsolutePath(file), name, hash, metadata.getLastModified());
                     builder.visit(fileSnapshot);
                 }
@@ -141,7 +146,7 @@ public class DirectorySnapshotter {
                 private String internedAbsolutePath(Path file) {
                     return stringInterner.intern(file.toString());
                 }
-
+                //过滤
                 private boolean isAllowed(Path path, String name, boolean isDirectory, @Nullable BasicFileAttributes attrs, Iterable<String> relativePath) {
                     if (isDirectory) {
                         if (defaultExcludes.excludeDir(name)) {

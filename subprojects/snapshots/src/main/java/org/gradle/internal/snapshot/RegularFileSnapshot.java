@@ -21,6 +21,7 @@ import org.gradle.internal.hash.HashCode;
 
 /**
  * A snapshot of a regular file.
+ * 正常文件的快照
  */
 public class RegularFileSnapshot extends AbstractFileSystemLocationSnapshot {
     private final HashCode contentHash;
