@@ -43,6 +43,7 @@ public class ProcessBootstrap {
     }
 
     private void runNoExit(String mainClassName, String[] args) throws Exception {
+        //设置类加载路径等。
         ClassPathRegistry classPathRegistry = new DefaultClassPathRegistry(new DefaultClassPathProvider(new DefaultModuleRegistry(CurrentGradleInstallation.get())));
         ClassLoaderFactory classLoaderFactory = new DefaultClassLoaderFactory();
         ClassPath antClasspath = classPathRegistry.getClassPath("ANT");

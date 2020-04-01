@@ -74,15 +74,20 @@ public class ParametersConverter extends AbstractCommandLineConverter<Parameters
 
     @Override
     public Parameters convert(ParsedCommandLine args, Parameters target) throws CommandLineArgumentException {
+        //向 layout 中解析参数 (project-dir 等
         layoutConverter.convert(args, target.getLayout());
 
         Map<String, String> properties = new HashMap<String, String>();
+        //根据 build layout (project-dir) 解析 gradle.properties 等参数
         layoutToPropertiesConverter.convert(target.getLayout(), properties);
+        //解析 -D 参数
         propertiesConverter.convert(args, properties);
-
+        //把 properties 解析成 StartParameter
         propertiesToStartParameterConverter.convert(properties, target.getStartParameter());
+        //解析其他更多的命令行参数（ org.gradle.parallel， -P ，task ）到 StartParameter
+        //具体看 DefaultCommandLineConverter
         commandLineConverter.convert(args, target.getStartParameter());
-
+        //通过 -D 等系统参数 解析出 虚拟进程的参数
         DaemonParameters daemonParameters = new DaemonParameters(target.getLayout(), target.getStartParameter().getSystemPropertiesArgs());
         propertiesToDaemonParametersConverter.convert(properties, daemonParameters);
         daemonConverter.convert(args, daemonParameters);

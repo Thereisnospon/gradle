@@ -135,12 +135,14 @@ public class DefaultModuleRegistry implements ModuleRegistry, CachedJarFileStore
         }
         throw new UnknownModuleException(String.format("Cannot locate JAR for module '%s' in distribution directory '%s'.", moduleName, gradleInstallation.getGradleHome()));
     }
-
+    //根据 moduleName 定位 jar 包，读取里面 name + "-classpath.properties" 文件，或者 jar meta 信息，读取到依赖的其他 module name 等
     private Module loadOptionalModule(String moduleName) {
+        //利用 gradleInstallation 定位 moduleName 对应的 jar
         File jarFile = findJar(moduleName);
         if (jarFile != null) {
             Set<File> implementationClasspath = new LinkedHashSet<File>();
             implementationClasspath.add(jarFile);
+            //找 jar 里面的资源 name + "-classpath.properties" 构造 Module
             Properties properties = loadModuleProperties(moduleName, jarFile);
             return module(moduleName, properties, implementationClasspath);
         }

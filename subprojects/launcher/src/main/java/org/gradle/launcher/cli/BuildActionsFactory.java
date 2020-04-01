@@ -68,10 +68,11 @@ class BuildActionsFactory implements CommandLineAction {
 
     //根据解析的 properties, 命令行参数等 创建 build action
     public Runnable createAction(CommandLineParser parser, ParsedCommandLine commandLine) {
+        //先委托 parametersConverter 解析好命令行参数等 （StartParameterInternal，DaemonParameters
         Parameters parameters = parametersConverter.convert(commandLine, new Parameters());
 
         parameters.getDaemonParameters().applyDefaultsFor(jvmVersionDetector.getJavaVersion(parameters.getDaemonParameters().getEffectiveJvm()));
-
+        //关闭守护进程
         if (parameters.getDaemonParameters().isStop()) {
             return stopAllDaemons(parameters.getDaemonParameters(), loggingServices);
         }
@@ -166,6 +167,7 @@ class BuildActionsFactory implements CommandLineAction {
     }
 
     private Runnable runBuildAndCloseServices(StartParameterInternal startParameter, DaemonParameters daemonParameters, BuildActionExecuter<BuildActionParameters> executer, ServiceRegistry sharedServices, Object... stopBeforeSharedServices) {
+        //组合 参数
         BuildActionParameters parameters = createBuildActionParameters(startParameter, daemonParameters);
         Stoppable stoppable = new CompositeStoppable().add(stopBeforeSharedServices).add(sharedServices);
         return new RunBuildAction(executer, startParameter, clientMetaData(), getBuildStartTime(), parameters, sharedServices, stoppable);
@@ -181,7 +183,7 @@ class BuildActionsFactory implements CommandLineAction {
                 startParameter.isContinuous(),
                 ClassPath.EMPTY);
     }
-
+    // 构造 buildStart time
     private long getBuildStartTime() {
         return ManagementFactory.getRuntimeMXBean().getStartTime();
     }

@@ -28,7 +28,7 @@ public class DefaultClassPathRegistry implements ClassPathRegistry {
     public DefaultClassPathRegistry(ClassPathProvider... providers) {
         this.providers.addAll(Arrays.asList(providers));
     }
-
+    //委托 ClassPathProvider 查找
     public ClassPath getClassPath(String name) {
         for (ClassPathProvider provider : providers) {
             ClassPath classpath = provider.findClassPath(name);

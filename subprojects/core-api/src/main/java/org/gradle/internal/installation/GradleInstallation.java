@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
+//可以用来定位 当前执行的 gradle 的位置（原理是利用 classLoader )
 public class GradleInstallation {
 
     public static final FileFilter DIRECTORY_FILTER = new FileFilter() {

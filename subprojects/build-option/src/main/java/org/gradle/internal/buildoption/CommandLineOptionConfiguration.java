@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * Configuration for a command line option.
- *
+ * 命令行选项配置
  * @since 4.3
  */
 public class CommandLineOptionConfiguration {

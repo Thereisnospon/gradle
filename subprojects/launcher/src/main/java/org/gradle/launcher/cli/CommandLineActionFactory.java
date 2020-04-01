@@ -88,6 +88,7 @@ public class CommandLineActionFactory {
      * @return The action to execute.
      */
     public Action<ExecutionListener> convert(List<String> args) {
+        //先配置好 log 服务
         ServiceRegistry loggingServices = createLoggingServices();
 
         LoggingConfiguration loggingConfiguration = new DefaultLoggingConfiguration();
@@ -96,7 +97,9 @@ public class CommandLineActionFactory {
             buildLayoutFactory,
             args,
             loggingConfiguration,
+            //真正的命令行解析和 Build  动作
             new ParseAndBuildAction(loggingServices, args),
+            //报告 build 错误
             new BuildExceptionReporter(loggingServices.get(StyledTextOutputFactory.class), loggingConfiguration, clientMetaData()));
     }
 
@@ -312,11 +315,15 @@ public class CommandLineActionFactory {
             this.action = action;
             this.reporter = reporter;
         }
-
+        // 包装了真正的 parse and build action
         public void execute(ExecutionListener executionListener) {
+            //log 级别等 参数解析
             CommandLineConverter<LoggingConfiguration> loggingConfigurationConverter = new LoggingCommandLineConverter();
+            //gradle-user-home , project-dir 等参数解析
             CommandLineConverter<BuildLayoutParameters> buildLayoutConverter = new LayoutCommandLineConverter();
+            //org.gradle.parallel , max-workers 等参数解析
             CommandLineConverter<ParallelismConfiguration> parallelConverter = new ParallelismConfigurationCommandLineConverter();
+            //-D systemProperties 参数解析
             CommandLineConverter<Map<String, String>> systemPropertiesCommandLineConverter = new SystemPropertiesCommandLineConverter();
             LayoutToPropertiesConverter layoutToPropertiesConverter = new LayoutToPropertiesConverter(buildLayoutFactory);
 
@@ -333,18 +340,22 @@ public class CommandLineActionFactory {
             parser.allowMixedSubcommandsAndOptions();
 
             try {
+                //先解析命令行参数
                 ParsedCommandLine parsedCommandLine = parser.parse(args);
-
+                //解析 gradle-user-home , project-dir 等
                 buildLayoutConverter.convert(parsedCommandLine, buildLayout);
 
 
                 Map<String, String> properties = new HashMap<String, String>();
                 // Read *.properties files
+                //根据之前 buildLayout 解析到的 project-dir，从中读取 gradle.properties 等到 properties 中
                 layoutToPropertiesConverter.convert(buildLayout, properties);
                 // Read -D command line flags
+                //解析 -D 命令行参数到 properties 中
                 systemPropertiesCommandLineConverter.convert(parsedCommandLine, properties);
 
                 // Convert properties for logging  object
+                //properties 转换到 log 中
                 PropertiesToLogLevelConfigurationConverter propertiesToLogLevelConfigurationConverter = new PropertiesToLogLevelConfigurationConverter();
                 propertiesToLogLevelConfigurationConverter.convert(properties, loggingConfiguration);
                 loggingConfigurationConverter.convert(parsedCommandLine, loggingConfiguration);
@@ -356,23 +367,30 @@ public class CommandLineActionFactory {
                 parallelConverter.convert(parsedCommandLine, parallelismConfiguration);
             } catch (CommandLineArgumentException e) {
                 // Ignore, deal with this problem later
+                //这里只是先简单的扫一遍参数，真正的 执行，错误处理需要在后面进行
             }
 
             LoggingManagerInternal loggingManager = loggingServices.getFactory(LoggingManagerInternal.class).create();
+            //根据第一步命令行参数得到的 loglevel
             loggingManager.setLevelInternal(loggingConfiguration.getLogLevel());
             loggingManager.start();
+            //action 为原始的 parse and build action, reporter 为原始的 build 错误 reporter
             Action<ExecutionListener> exceptionReportingAction = new ExceptionReportingAction(action, reporter, loggingManager);
             try {
+                //配置native相关？
                 NativeServices.initialize(buildLayout.getGradleUserHomeDir());
+                //配置log显示到控制台相关逻辑?
                 loggingManager.attachProcessConsole(loggingConfiguration.getConsoleOutput());
+                //gradle 欢迎信息(版本首次安装时?)
                 new WelcomeMessageAction(buildLayout).execute(System.out);
+                //真正执行 parse and build action
                 exceptionReportingAction.execute(executionListener);
             } finally {
                 loggingManager.stop();
             }
         }
     }
-
+    //初步解析命令行参数之后真正执行的 解析和 Build 操作
     private class ParseAndBuildAction implements Action<ExecutionListener> {
         private final ServiceRegistry loggingServices;
         private final List<String> args;
@@ -384,7 +402,9 @@ public class CommandLineActionFactory {
 
         public void execute(ExecutionListener executionListener) {
             List<CommandLineAction> actions = new ArrayList<CommandLineAction>();
+            //help, version
             actions.add(new BuiltInActions());
+            //解析系统参数，命令行参数等
             createActionFactories(loggingServices, actions);
 
             CommandLineParser parser = new CommandLineParser();

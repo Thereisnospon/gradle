@@ -52,6 +52,7 @@ public class RunBuildAction implements Runnable {
 
     public void run() {
         try {
+            //在 executor execute
             BuildActionResult result = executer.execute(
                     new ExecuteBuildAction(startParameter),
                     new DefaultBuildRequestContext(new DefaultBuildRequestMetaData(clientMetaData, startTime, ConsoleStateUtil.isInteractive()), new DefaultBuildCancellationToken(), new NoOpBuildEventConsumer()),

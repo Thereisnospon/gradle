@@ -24,7 +24,7 @@ import org.gradle.internal.concurrent.Stoppable;
 import org.gradle.internal.reflect.Instantiator;
 
 import java.util.concurrent.Executor;
-
+//通过外部命令 shell 执行某些 shell 命令，java 应用 等
 public class DefaultExecActionFactory implements ExecFactory, Stoppable {
     private final FileResolver fileResolver;
     private final DefaultExecutorFactory executorFactory = new DefaultExecutorFactory();

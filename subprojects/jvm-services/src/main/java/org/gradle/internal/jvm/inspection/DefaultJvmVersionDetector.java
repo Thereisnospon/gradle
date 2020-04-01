@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+//获取 jvm 版本信息等
 public class DefaultJvmVersionDetector implements JvmVersionDetector {
     private final ExecHandleFactory execHandleFactory;
 

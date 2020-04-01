@@ -25,6 +25,7 @@ import java.util.Map;
 /**
  * Represents a option for a build provided by the user via Gradle property and/or a command line option.
  *
+ * 代表从 gradle property 或 命令行参数 解析出来的 build 选项
  * @since 4.3
  */
 public interface BuildOption<T> {

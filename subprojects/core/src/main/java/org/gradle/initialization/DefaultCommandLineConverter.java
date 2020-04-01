@@ -65,12 +65,13 @@ public class DefaultCommandLineConverter extends AbstractCommandLineConverter<St
 
     public StartParameterInternal convert(final ParsedCommandLine options, final StartParameterInternal startParameter) throws CommandLineArgumentException {
         loggingConfigurationCommandLineConverter.convert(options, startParameter);
+        //org.gradle.parallel , max-workers 等参数解析
         parallelConfigurationCommandLineConverter.convert(options, startParameter);
         Transformer<File, String> resolver = new BasicFileResolver(startParameter.getCurrentDir());
 
         Map<String, String> systemProperties = systemPropertiesCommandLineConverter.convert(options, new HashMap<String, String>());
         convertCommandLineSystemProperties(systemProperties, startParameter, resolver);
-
+        //解析 -P 等参数
         Map<String, String> projectProperties = projectPropertiesCommandLineConverter.convert(options, new HashMap<String, String>());
         startParameter.getProjectProperties().putAll(projectProperties);
 
@@ -84,7 +85,7 @@ public class DefaultCommandLineConverter extends AbstractCommandLineConverter<St
             startParameter.setProjectDir(layout.getProjectDir());
         }
         startParameter.setSearchUpwards(layout.getSearchUpwards());
-
+        //task 等参数
         if (!options.getExtraArguments().isEmpty()) {
             startParameter.setTaskNames(options.getExtraArguments());
         }

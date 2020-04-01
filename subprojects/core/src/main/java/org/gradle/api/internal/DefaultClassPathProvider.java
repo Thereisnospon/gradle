@@ -25,10 +25,11 @@ public class DefaultClassPathProvider implements ClassPathProvider {
     public DefaultClassPathProvider(ModuleRegistry moduleRegistry) {
         this.moduleRegistry = moduleRegistry;
     }
-
+    //DefaultClassPathProvider findClassPath, 是根据 name 写死寻找。
     public ClassPath findClassPath(String name) {
         if (name.equals("GRADLE_RUNTIME")) {
             ClassPath classpath = ClassPath.EMPTY;
+            // 看起来是根据 module name,然后寻找它依赖的 module, 得到完整的 ClassPath
             for (Module module : moduleRegistry.getModule("gradle-launcher").getAllRequiredModules()) {
                 classpath = classpath.plus(module.getClasspath());
             }

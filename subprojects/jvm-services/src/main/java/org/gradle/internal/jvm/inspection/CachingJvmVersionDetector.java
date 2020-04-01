@@ -22,7 +22,7 @@ import org.gradle.internal.jvm.Jvm;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
+//带缓存的 jvm 版本信息
 public class CachingJvmVersionDetector implements JvmVersionDetector {
     private final Map<JavaInfo, JavaVersion> javaHomeResults = new ConcurrentHashMap<JavaInfo, JavaVersion>();
     private final Map<String, JavaVersion> javaCmdResults = new ConcurrentHashMap<String, JavaVersion>();
