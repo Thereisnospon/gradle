@@ -37,6 +37,11 @@ import java.io.IOException;
  * </p>
  *
  * @since 3.5
+ *
+ * 该实现类需要在下面情况
+ *  1. 检索不到 key 对应的 cache
+ *  2. 上传 cache 失败
+ * 这些情况抛出 BuildCacheException ，这个异常不会中断构建过程，但是出现该错误太多次，会关闭 build-cache 功能
  */
 public interface BuildCacheService extends Closeable {
     /**
@@ -46,6 +51,8 @@ public interface BuildCacheService extends Closeable {
      * @param reader the reader to read the data corresponding to the cache key.
      * @return {@code true} if an entry was found, {@code false} otherwise.
      * @throws BuildCacheException if the cache fails to load a cache entry for the given key
+     *
+     * 加载缓存
      */
     boolean load(BuildCacheKey key, BuildCacheEntryReader reader) throws BuildCacheException;
 
@@ -55,6 +62,8 @@ public interface BuildCacheService extends Closeable {
      * @param key the cache key.
      * @param writer the writer to write the data corresponding to the cache key.
      * @throws BuildCacheException if the cache fails to store a cache entry for the given key
+     *
+     * 上传/存储缓存
      */
     void store(BuildCacheKey key, BuildCacheEntryWriter writer) throws BuildCacheException;
 

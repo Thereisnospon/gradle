@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 
 /**
  * A persistent store of objects of type V indexed by a key of type K.
+ * K类型 为 key 作为索引 ，V类型 为存储值 的 持久化存储系统
  */
 public interface PersistentIndexedCache<K, V> {
     /**
@@ -29,6 +30,8 @@ public interface PersistentIndexedCache<K, V> {
      * A shared or exclusive file lock is held while fetching the value, depending on implementation.
      *
      * @return The value, or null if no value associated with the key.
+     * 获取 key 映射的 cache, 会在它可用前 block.
+     * 根据实现可能会采用 共享锁/排它锁
      */
     @Nullable
     V get(K key);
@@ -42,6 +45,8 @@ public interface PersistentIndexedCache<K, V> {
      *
      * A file lock is held until the value has been produced and written to the persistent store, and other processes will be blocked from producing the same value until this process has completed doing so.
      *
+     * 返回 key 映射的 cache ,如果不存在时通过 producer 进行 构造。
+     * （多线程访问时应该只有一个构造
      * @return The value.
      */
     V get(K key, Transformer<? extends V, ? super K> producer);
@@ -50,6 +55,7 @@ public interface PersistentIndexedCache<K, V> {
      * Maps the given value to the given key, replacing any existing value.
      *
      * The implementation may do this synchronously or asynchronously. A file lock is held until the value has been written to the persistent store.
+     *
      */
     void put(K key, V value);
 

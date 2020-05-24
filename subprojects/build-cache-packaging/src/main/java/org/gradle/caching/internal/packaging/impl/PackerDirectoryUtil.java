@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class PackerDirectoryUtil {
+    //确保文件的目录存在，如果 root 是目录，不存在该目录则创建该目录， 如果 root 是 file, 那么 parent 目录不存在则创建
     public static void ensureDirectoryForTree(TreeType type, File root) throws IOException {
         switch (type) {
             case DIRECTORY:

@@ -50,6 +50,8 @@ import java.util.Set;
 
 /**
  * Build cache implementation that delegates to a service accessible via HTTP.
+ *
+ * 构造 http 请求 加载/存储 build-cache
  */
 public class HttpBuildCacheService implements BuildCacheService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpBuildCacheService.class);

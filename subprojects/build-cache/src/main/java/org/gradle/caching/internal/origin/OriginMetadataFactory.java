@@ -32,7 +32,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 import java.util.Set;
-
+//build-cache entity meta data
 public class OriginMetadataFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OriginMetadataFactory.class);

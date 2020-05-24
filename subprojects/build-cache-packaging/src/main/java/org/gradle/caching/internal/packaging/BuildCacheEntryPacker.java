@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
-
+//build-cache打包器
 public interface BuildCacheEntryPacker {
     PackResult pack(CacheableEntity entity, Map<String, CurrentFileCollectionFingerprint> fingerprints, OutputStream output, OriginWriter writeOrigin) throws IOException;
 
@@ -46,6 +46,7 @@ public interface BuildCacheEntryPacker {
     UnpackResult unpack(CacheableEntity entity, InputStream input, OriginReader readOrigin) throws IOException;
 
     class UnpackResult {
+        //构造 build-cache 时的元信息
         private final OriginMetadata originMetadata;
         private final long entries;
         private final Map<String, ? extends FileSystemLocationSnapshot> snapshots;

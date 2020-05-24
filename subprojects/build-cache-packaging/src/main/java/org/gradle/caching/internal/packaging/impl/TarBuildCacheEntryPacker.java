@@ -100,6 +100,15 @@ public class TarBuildCacheEntryPacker implements BuildCacheEntryPacker {
         this.stringInterner = stringInterner;
     }
 
+    /**
+     * 打包 build-cache
+     * @param entity
+     * @param fingerprints
+     * @param output
+     * @param writeOrigin
+     * @return
+     * @throws IOException
+     */
     @Override
     public PackResult pack(CacheableEntity entity, Map<String, CurrentFileCollectionFingerprint> fingerprints, OutputStream output, OriginWriter writeOrigin) throws IOException {
         BufferedOutputStream bufferedOutput;
@@ -112,12 +121,19 @@ public class TarBuildCacheEntryPacker implements BuildCacheEntryPacker {
             tarOutput.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);
             tarOutput.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_POSIX);
             tarOutput.setAddPaxHeadersForNonAsciiNames(true);
+
+            /** @see  org.gradle.caching.internal.origin.OriginMetadataFactory
+             *  写 gradleVersion ，creationTime ， executionTime 等信息
+             * */
             packMetadata(writeOrigin, tarOutput);
             long entryCount = pack(entity, fingerprints, tarOutput);
             return new PackResult(entryCount + 1);
         }
     }
 
+    /**
+     * @see  org.gradle.caching.internal.origin.OriginMetadataFactory
+     */
     private void packMetadata(OriginWriter writeMetadata, TarArchiveOutputStream tarOutput) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         writeMetadata.execute(baos);
@@ -132,6 +148,7 @@ public class TarBuildCacheEntryPacker implements BuildCacheEntryPacker {
             if (root == null) {
                 return;
             }
+            //遍历文件
             CurrentFileCollectionFingerprint fingerprint = fingerprints.get(treeName);
             try {
                 entries.increment(packTree(treeName, type, fingerprint, tarOutput));
@@ -144,6 +161,7 @@ public class TarBuildCacheEntryPacker implements BuildCacheEntryPacker {
 
     private long packTree(String name, TreeType type, CurrentFileCollectionFingerprint fingerprint, TarArchiveOutputStream tarOutput) {
         PackingVisitor packingVisitor = new PackingVisitor(tarOutput, name, type, fileSystem);
+        //打包
         fingerprint.accept(packingVisitor);
         return packingVisitor.finish();
     }
@@ -155,6 +173,14 @@ public class TarBuildCacheEntryPacker implements BuildCacheEntryPacker {
         tarOutput.putArchiveEntry(entry);
     }
 
+    /**
+     * 解包 build-cache
+     * @param entity
+     * @param input
+     * @param readOrigin
+     * @return
+     * @throws IOException
+     */
     @Override
     public UnpackResult unpack(CacheableEntity entity, InputStream input, OriginReader readOrigin) throws IOException {
         try (TarArchiveInputStream tarInput = new TarArchiveInputStream(input)) {
@@ -180,19 +206,21 @@ public class TarBuildCacheEntryPacker implements BuildCacheEntryPacker {
         while (tarEntry != null) {
             entries.increment(1);
             String path = tarEntry.getName();
-
+            //获取 gradleVersion ，creationTime ， executionTime 等信息
             if (path.equals(METADATA_PATH)) {
                 // handle origin metadata
                 originMetadata = readOriginAction.execute(new CloseShieldInputStream(tarInput));
                 tarEntry = tarInput.getNextTarEntry();
             } else {
                 // handle tree
+                //文件内容
                 Matcher matcher = TREE_PATH.matcher(path);
                 if (!matcher.matches()) {
                     throw new IllegalStateException("Cached entry format error, invalid contents: " + path);
                 }
 
                 String treeName = unescape(matcher.group(2));
+                //匹配 打包和解包 tar entity 中 treeName
                 CacheableTree tree = treesByName.get(treeName);
                 if (tree == null) {
                     throw new IllegalStateException(String.format("No tree '%s' registered", treeName));
@@ -200,6 +228,7 @@ public class TarBuildCacheEntryPacker implements BuildCacheEntryPacker {
 
                 boolean missing = matcher.group(1) != null;
                 String childPath = matcher.group(3);
+                //解包 到匹配 tree name 的那个 tree 的 root file 中
                 tarEntry = unpackTree(treeName, tree.getType(), tree.getRoot(), tarInput, tarEntry, childPath, missing, snapshots, entries);
             }
         }
@@ -246,6 +275,7 @@ public class TarBuildCacheEntryPacker implements BuildCacheEntryPacker {
             if (isDirEntry) {
                 throw new IllegalStateException("Should be a file: " + treeName);
             }
+            //解包普通文件
             RegularFileSnapshot fileSnapshot = unpackFile(input, rootEntry, treeRoot, treeRoot.getName());
             snapshots.put(treeName, fileSnapshot);
             return input.getNextTarEntry();
@@ -255,7 +285,7 @@ public class TarBuildCacheEntryPacker implements BuildCacheEntryPacker {
             throw new IllegalStateException("Should be a directory: " + treeName);
         }
         chmodUnpackedFile(rootEntry, treeRoot);
-
+        //解包目录
         return unpackDirectoryTree(input, rootEntry, snapshots, entries, treeRoot, treeName);
     }
 
@@ -272,7 +302,9 @@ public class TarBuildCacheEntryPacker implements BuildCacheEntryPacker {
         OutputStream output = new FileOutputStream(file);
         HashCode hash;
         try {
+            //一边拷贝一边hash
             hash = streamHasher.hashCopy(input, output);
+            //权限复原
             chmodUnpackedFile(entry, file);
         } finally {
             IoActions.closeQuietly(output);

@@ -24,6 +24,7 @@ import java.io.File;
 
 /**
  * An entity that can potentially be stored in the build cache.
+ * 能被 通过 build-cache 存储的元素
  */
 public interface CacheableEntity extends Describable {
     String getIdentity();
